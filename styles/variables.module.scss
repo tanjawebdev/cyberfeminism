@@ -1,0 +1,99 @@
+// Body
+$body-bg: #121212;
+$body-color: #e0e0e0;
+
+// Colors
+$primary: #bb86fc;
+$secondary: #03dac6;
+$success: #00e676;
+$info: #2196f3;
+$warning: #ffab00;
+$danger: #cf6679;
+$light: #f5f5f5;
+$dark: #212121;
+
+// Links
+$link-color: $primary;
+$link-hover-color: lighten($primary, 10%);
+$link-decoration: none;
+$link-hover-decoration: underline;
+
+// Grid
+$enable-grid-classes: true;
+$enable-cssgrid: true;
+
+// Borders
+$border-color: #333;
+$border-width: 1px;
+$border-radius: 0.25rem;
+$border-radius-lg: 0.3rem;
+$border-radius-sm: 0.2rem;
+
+// Buttons
+$btn-padding-y: 0.375rem;
+$btn-padding-x: 0.75rem;
+$btn-font-weight: 400;
+$btn-box-shadow: none;
+$btn-primary-bg: $primary;
+$btn-primary-border: $primary;
+$btn-primary-hover-bg: darken($primary, 10%);
+$btn-primary-hover-border: darken($primary, 10%);
+$btn-secondary-bg: $secondary;
+$btn-secondary-border: $secondary;
+$btn-secondary-hover-bg: darken($secondary, 10%);
+$btn-secondary-hover-border: darken($secondary, 10%);
+
+// Forms
+$form-control-bg: #333;
+$form-control-border-color: #444;
+$form-control-color: #e0e0e0;
+$form-control-focus-bg: #444;
+$form-control-focus-border-color: $primary;
+$form-control-focus-color: #e0e0e0;
+
+// Navbar
+$navbar-color: #e0e0e0;
+$navbar-bg: #212121;
+$navbar-brand-color: #e0e0e0;
+$navbar-brand-hover-color: lighten($primary, 10%);
+$navbar-nav-link-color: #e0e0e0;
+$navbar-nav-link-hover-color: lighten($primary, 10%);
+$navbar-toggler-icon-bg: #e0e0e0;
+
+// Cards
+$card-bg: #1e1e1e;
+$card-border-color: #333;
+$card-color: #e0e0e0;
+$card-header-bg: #212121;
+$card-header-border-color: #333;
+$card-footer-bg: #212121;
+$card-footer-border-color: #333;
+
+// Modals
+$modal-content-bg: #1e1e1e;
+$modal-content-border-color: #333;
+$modal-content-color: #e0e0e0;
+$modal-header-bg: #212121;
+$modal-header-border-color: #333;
+$modal-footer-bg: #212121;
+$modal-footer-border-color: #333;
+
+// Tables
+$table-bg: transparent;
+$table-accent-bg: rgba(255, 255, 255, 0.05);
+$table-hover-bg: rgba(255, 255, 255, 0.075);
+$table-border-color: #444;
+
+// Tooltips
+$tooltip-color: #212121;
+$tooltip-bg: #e0e0e0;
+$tooltip-border-color: #333;
+
+// Custom
+$custom-primary: $primary;
+$custom-secondary: $secondary;
+$custom-body-bg: #121212;
+$custom-body-color: #e0e0e0;
+$custom-border-color: #333;
+$custom-border-radius: 0.25rem;
+$custom-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
