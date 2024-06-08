@@ -1,10 +1,14 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { storage, db } from '@/lib/firebase'; // Adjust the import path as needed
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
 import './NewItemForm.scss';
 
 const NewItemForm = () => {
     const [file, setFile] = useState(null);
     const [dropdownValue, setDropdownValue] = useState('');
     const [sliderValue, setSliderValue] = useState(50);
+    const [uploading, setUploading] = useState(false);
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -18,16 +22,40 @@ const NewItemForm = () => {
         setSliderValue(e.target.value);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle form submission (e.g., send data to API or update state)
-        console.log('Submitted:', {
-            file,
-            dropdownValue,
-            sliderValue,
-        });
-    };
+        if (!file) {
+            alert("Please upload a file.");
+            return;
+        }
 
+        setUploading(true);
+
+        try {
+            // Upload file to Firebase Storage
+            const fileRef = ref(storage, `uploads/${file.name}`);
+            await uploadBytes(fileRef, file);
+            const fileUrl = await getDownloadURL(fileRef);
+
+            // Save metadata to Firestore
+            await addDoc(collection(db, 'items'), {
+                fileUrl,
+                category: dropdownValue,
+                rating: sliderValue,
+                createdAt: new Date(),
+            });
+
+            alert("File uploaded and metadata saved successfully!");
+        } catch (error) {
+            console.error("Error uploading file and saving metadata: ", error);
+            alert("Error uploading file and saving metadata.");
+        } finally {
+            setUploading(false);
+            setFile(null);
+            setDropdownValue('');
+            setSliderValue(50);
+        }
+    };
 
     return (
         <form onSubmit={handleSubmit}>
@@ -64,7 +92,9 @@ const NewItemForm = () => {
                 <span>{sliderValue}</span>
             </div>
 
-            <button type="submit">Submit</button>
+            <button type="submit" disabled={uploading}>
+                {uploading ? "Uploading..." : "Submit"}
+            </button>
         </form>
     );
 };
