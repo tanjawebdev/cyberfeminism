@@ -5,6 +5,8 @@ import Image from "next/image";
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import "@styles/home.scss";
+import InfoModal from "@components/infoModal/InfoModal";
+import HomeModal from "@components/homeModal/HomeModal";
 
 interface UploadedItem {
     fileUrl: string;
@@ -18,6 +20,7 @@ interface UploadedItem {
 export default function Home() {
     const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [isHomeModalOpen, setHomeModalOpen] = useState<boolean>(false);
 
     const fetchItems = (category: string | null) => {
         const itemsRef = collection(db, 'items');
@@ -51,9 +54,20 @@ export default function Home() {
         setSelectedCategory(category);
     };
 
+    const handleOpenHomeModal = () => {
+        setHomeModalOpen(true);
+    };
+
+    const handleCloseHomeModal = () => {
+        setHomeModalOpen(false);
+    };
+
     return (
         <main className="home">
             <div>Startscreen</div>
+            <div className="home__home-modal">
+                <div className="btn btn-primary g-col" onClick={handleOpenHomeModal}>edit or add items</div>
+            </div>
             <div className="container">
                 <div className="home__uploadedItems grid">
                     {uploadedItems.map((item, index) => (
@@ -78,6 +92,8 @@ export default function Home() {
                     <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick('option2')}>Memes</div>
                     <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick('option3')}>Books</div>
                 </div>
+
+                <HomeModal isOpen={isHomeModalOpen} onClose={handleCloseHomeModal}/>
             </div>
         </main>
     );
