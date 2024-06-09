@@ -5,16 +5,21 @@ import { useRouter } from 'next/navigation';
 import Modal from '@components/modal/Modal';
 import '@components/modal/Modal.scss';
 
-const ChangeItemModal = ({ isOpen, onClose }) => {
+interface ChangeItemModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+const ChangeItemModal: React.FC<ChangeItemModalProps> = ({ isOpen, onClose }) => {
     const [inputValue, setInputValue] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const value = parseInt(inputValue, 10);
         if (isNaN(value) || value < 1 || value > 999) {
