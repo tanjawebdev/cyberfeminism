@@ -53,7 +53,7 @@ const EditItemForm = () => {
                 });
 
                 alert('Slider value updated successfully!');
-                router.push('/'); // Redirect to home page after update
+                router.push('/voting'); // Redirect to home page after update
             } else {
                 console.error('No such document!');
             }

@@ -6,8 +6,16 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import variables from "@styles/variables.module.scss";
 
+interface UploadedItem {
+    fileUrl: string;
+    category: string;
+    rating: number;
+    id: number;
+    createdAt: Date;
+}
+
 export default function Home() {
-    const [uploadedItems, setUploadedItems] = useState([]);
+    const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([]);
 
     useEffect(() => {
         const unsubscribe = onSnapshot(collection(db, 'items'), (snapshot) => {
@@ -16,7 +24,7 @@ export default function Home() {
                 return {
                     ...data,
                     createdAt: data.createdAt.toDate(), // Convert Firestore timestamp to JavaScript Date
-                };
+                } as UploadedItem;
             });
             setUploadedItems(items);
         });
