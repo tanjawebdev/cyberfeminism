@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { storage, db } from '@/lib/firebase'; // Adjust the import path as needed
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
+import { storage, db } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, doc, runTransaction } from 'firebase/firestore';
 import './NewItemForm.scss';
 
 const NewItemForm = () => {
@@ -25,7 +25,7 @@ const NewItemForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!file) {
-            alert("Please upload a file.");
+            alert('Please upload a file.');
             return;
         }
 
@@ -37,18 +37,31 @@ const NewItemForm = () => {
             await uploadBytes(fileRef, file);
             const fileUrl = await getDownloadURL(fileRef);
 
-            // Save metadata to Firestore
-            await addDoc(collection(db, 'items'), {
-                fileUrl,
-                category: dropdownValue,
-                rating: sliderValue,
-                createdAt: new Date(),
+            // Transaction to update counter and add new item
+            await runTransaction(db, async (transaction) => {
+                const counterDocRef = doc(db, 'counters', 'itemCounter');
+                const counterDoc = await transaction.get(counterDocRef);
+                if (!counterDoc.exists()) {
+                    throw 'Counter document does not exist!';
+                }
+
+                const newId = counterDoc.data().currentId + 1;
+                transaction.update(counterDocRef, { currentId: newId });
+
+                const newItemRef = doc(collection(db, 'items'));
+                transaction.set(newItemRef, {
+                    id: newId,
+                    fileUrl,
+                    category: dropdownValue,
+                    rating: sliderValue,
+                    createdAt: new Date(),
+                });
             });
 
-            alert("File uploaded and metadata saved successfully!");
+            alert('File uploaded and metadata saved successfully!');
         } catch (error) {
-            console.error("Error uploading file and saving metadata: ", error);
-            alert("Error uploading file and saving metadata.");
+            console.error('Error uploading file and saving metadata: ', error);
+            alert('Error uploading file and saving metadata.');
         } finally {
             setUploading(false);
             setFile(null);
@@ -72,7 +85,9 @@ const NewItemForm = () => {
             <div className="form-group">
                 <label htmlFor="dropdown">Select Category:</label>
                 <select id="dropdown" value={dropdownValue} onChange={handleDropdownChange}>
-                    <option value="" disabled>Select an option</option>
+                    <option value="" disabled>
+                        Select an option
+                    </option>
                     <option value="option1">Option 1</option>
                     <option value="option2">Option 2</option>
                     <option value="option3">Option 3</option>
@@ -93,7 +108,7 @@ const NewItemForm = () => {
             </div>
 
             <button type="submit" disabled={uploading}>
-                {uploading ? "Uploading..." : "Submit"}
+                {uploading ? 'Uploading...' : 'Submit'}
             </button>
         </form>
     );
