@@ -1,13 +1,15 @@
 'use client';
 
-import EditItemForm from '@components/editItemForm/EditItemForm';
+import React from 'react';
+import EditItemFormWrapper from '@components/editItemFormWrapper/EditItemFormWrapper';
 
-export default function VotingEditItem() {
-
+const VotingEditItem: React.FC = () => {
     return (
         <main className="voting">
-            <h1>Add New Item</h1>
-            <EditItemForm />
+            <h1>Edit Item</h1>
+            <EditItemFormWrapper />
         </main>
     );
-}
+};
+
+export default VotingEditItem;
