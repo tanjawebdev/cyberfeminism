@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Modal from '@components/modal/Modal';
-import styles from '@components/modal/Modal.scss';
+import '@components/modal/Modal.scss';
 
 const ChangeItemModal = ({ isOpen, onClose }) => {
     const [inputValue, setInputValue] = useState('');
     const [error, setError] = useState('');
+    const router = useRouter();
 
     const handleInputChange = (e) => {
         setInputValue(e.target.value);
@@ -20,8 +22,8 @@ const ChangeItemModal = ({ isOpen, onClose }) => {
         } else {
             setError('');
             console.log('Submitted ID:', value);
-            // Handle the submission (e.g., send to API or update state)
             onClose();
+            router.push(`/voting/edit-item?id=${value}`);
         }
     };
 
@@ -40,7 +42,7 @@ const ChangeItemModal = ({ isOpen, onClose }) => {
                 />
                 <button type="submit">Submit</button>
             </form>
-            {error && <p className={styles.error}>{error}</p>}
+            {error && <p className="error">{error}</p>}
         </Modal>
     );
 };
