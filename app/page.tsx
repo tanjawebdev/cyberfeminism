@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from "next/image";
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import variables from "@styles/variables.module.scss";
+import "@styles/home.scss";
 
 interface UploadedItem {
     fileUrl: string;
@@ -12,31 +12,50 @@ interface UploadedItem {
     rating: number;
     id: number;
     createdAt: Date;
+    allRatings: number[];
 }
 
 export default function Home() {
     const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-    useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, 'items'), (snapshot) => {
+    const fetchItems = (category: string | null) => {
+        const itemsRef = collection(db, 'items');
+        let q;
+        if (category) {
+            q = query(itemsRef, where('category', '==', category), orderBy('createdAt', 'desc'));
+        } else {
+            q = query(itemsRef, orderBy('createdAt', 'desc'));
+        }
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
             const items = snapshot.docs.map((doc) => {
                 const data = doc.data();
                 return {
                     ...data,
-                    createdAt: data.createdAt.toDate(), // Convert Firestore timestamp to JavaScript Date
+                    createdAt: data.createdAt.toDate(),
                 } as UploadedItem;
             });
             setUploadedItems(items);
         });
 
         return () => unsubscribe();
-    }, []);
+    };
+
+    useEffect(() => {
+        const unsubscribe = fetchItems(selectedCategory);
+        return () => unsubscribe();
+    }, [selectedCategory]);
+
+    const handleCategoryClick = (category: string | null) => {
+        setSelectedCategory(category);
+    };
 
     return (
-        <main>
-            <div className={variables.title}>Startscreen</div>
+        <main className="home">
+            <div>Startscreen</div>
             <div className="container">
-                <div className="uploadedItems">
+                <div className="home__uploadedItems grid">
                     {uploadedItems.map((item, index) => (
                         <div key={index} className="uploadedItem">
                             <Image
@@ -47,15 +66,17 @@ export default function Home() {
                             />
                             <p>Category: {item.category}</p>
                             <p>Rating: {item.rating}</p>
+                            <p>Number of Ratings: {item.allRatings.length}</p>
                             <p>ID: {item.id}</p>
                             <p>Created: {item.createdAt.toLocaleString()}</p>
                         </div>
                     ))}
                 </div>
-                <div className="grid">
-                    <div className="g-col-md-4">Test</div>
-                    <div className="g-col-md-4">Test</div>
-                    <div className="g-col-md-4">Test</div>
+                <div className="home__buttons grid">
+                    <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick(null)}>All</div>
+                    <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick('option1')}>Movies</div>
+                    <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick('option2')}>Memes</div>
+                    <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick('option3')}>Books</div>
                 </div>
             </div>
         </main>

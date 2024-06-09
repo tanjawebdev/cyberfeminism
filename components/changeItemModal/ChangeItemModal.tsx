@@ -45,7 +45,7 @@ const ChangeItemModal: React.FC<ChangeItemModalProps> = ({ isOpen, onClose }) =>
                     max="999"
                     required
                 />
-                <button type="submit">Submit</button>
+                <button className="btn btn-primary" type="submit">Submit</button>
             </form>
             {error && <p className="error">{error}</p>}
         </Modal>

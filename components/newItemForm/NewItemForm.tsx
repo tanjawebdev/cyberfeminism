@@ -4,6 +4,8 @@ import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { storage, db } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, doc, runTransaction } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
+
 import './NewItemForm.scss';
 
 interface FileType extends File {
@@ -11,6 +13,7 @@ interface FileType extends File {
 }
 
 const NewItemForm: React.FC = () => {
+    const router = useRouter();
     const [file, setFile] = useState<FileType | null>(null);
     const [dropdownValue, setDropdownValue] = useState<string>('');
     const [sliderValue, setSliderValue] = useState<number>(50);
@@ -63,10 +66,12 @@ const NewItemForm: React.FC = () => {
                     category: dropdownValue,
                     rating: sliderValue,
                     createdAt: new Date(),
+                    allRatings: [sliderValue],
                 });
             });
 
             alert('File uploaded and metadata saved successfully!');
+            router.push('/voting');
         } catch (error) {
             console.error('Error uploading file and saving metadata: ', error);
             alert('Error uploading file and saving metadata.');
@@ -92,7 +97,7 @@ const NewItemForm: React.FC = () => {
 
             <div className="form-group">
                 <label htmlFor="dropdown">Select Category:</label>
-                <select id="dropdown" value={dropdownValue} onChange={handleDropdownChange}>
+                <select id="dropdown" value={dropdownValue} onChange={handleDropdownChange} required>
                     <option value="" disabled>
                         Select an option
                     </option>

@@ -11,7 +11,8 @@ interface ItemData {
     category: string;
     rating: number;
     id: number;
-    createdAt: any; // Firestore timestamp, we will convert it later
+    createdAt: any;
+    allRatings: number[];
 }
 
 const EditItemForm: React.FC = () => {
@@ -56,8 +57,16 @@ const EditItemForm: React.FC = () => {
             const querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) {
                 const docRef = querySnapshot.docs[0].ref;
+                const currentData = querySnapshot.docs[0].data() as ItemData;
+
+                // Update the allRatings array with the new slider value
+                const updatedRatings = [...currentData.allRatings, sliderValue];
+                const averageRating = Math.round(updatedRatings.reduce((acc, rating) => acc + rating, 0) / updatedRatings.length);
+
+                // Update the document with the new average rating and the updated allRatings array
                 await updateDoc(docRef, {
-                    rating: sliderValue,
+                    rating: averageRating,
+                    allRatings: updatedRatings,
                 });
 
                 alert('Slider value updated successfully!');
@@ -78,17 +87,20 @@ const EditItemForm: React.FC = () => {
     return (
         <form onSubmit={handleSubmit}>
             <div className="form-group">
-                <label htmlFor="file-upload">Upload Image:</label>
-                <input type="file" id="file-upload" accept="image/*" disabled />
+                <label>Uploaded Image:</label>
+                <div>
+                    <img src={itemData.fileUrl} alt="Uploaded Item" className="uploaded-image"/>
+                </div>
             </div>
 
             <div className="form-group">
-                <label htmlFor="dropdown">Select Category:</label>
-                <select id="dropdown" value={itemData.category} disabled>
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
-                </select>
+                <label>Category:</label>
+                <p>{itemData.category}</p>
+            </div>
+
+            <div className="form-group">
+                <label>ID:</label>
+                <p>{itemData.id}</p>
             </div>
 
             <div className="form-group">
@@ -104,7 +116,7 @@ const EditItemForm: React.FC = () => {
                 <span>{sliderValue}</span>
             </div>
 
-            <button type="submit" disabled={updating}>
+            <button type="submit" disabled={updating} className="btn btn-primary">
                 {updating ? 'Updating...' : 'Submit'}
             </button>
         </form>
