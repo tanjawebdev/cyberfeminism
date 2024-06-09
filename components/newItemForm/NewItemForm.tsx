@@ -1,28 +1,36 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { storage, db } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, doc, runTransaction } from 'firebase/firestore';
 import './NewItemForm.scss';
 
-const NewItemForm = () => {
-    const [file, setFile] = useState(null);
-    const [dropdownValue, setDropdownValue] = useState('');
-    const [sliderValue, setSliderValue] = useState(50);
-    const [uploading, setUploading] = useState(false);
+interface FileType extends File {
+    name: string;
+}
 
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+const NewItemForm: React.FC = () => {
+    const [file, setFile] = useState<FileType | null>(null);
+    const [dropdownValue, setDropdownValue] = useState<string>('');
+    const [sliderValue, setSliderValue] = useState<number>(50);
+    const [uploading, setUploading] = useState<boolean>(false);
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFile(e.target.files[0] as FileType);
+        }
     };
 
-    const handleDropdownChange = (e) => {
+    const handleDropdownChange = (e: ChangeEvent<HTMLSelectElement>) => {
         setDropdownValue(e.target.value);
     };
 
-    const handleSliderChange = (e) => {
-        setSliderValue(e.target.value);
+    const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setSliderValue(parseInt(e.target.value, 10));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!file) {
             alert('Please upload a file.');
@@ -42,7 +50,7 @@ const NewItemForm = () => {
                 const counterDocRef = doc(db, 'counters', 'itemCounter');
                 const counterDoc = await transaction.get(counterDocRef);
                 if (!counterDoc.exists()) {
-                    throw 'Counter document does not exist!';
+                    throw new Error('Counter document does not exist!');
                 }
 
                 const newId = counterDoc.data().currentId + 1;

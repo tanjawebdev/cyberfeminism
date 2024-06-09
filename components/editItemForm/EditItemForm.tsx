@@ -6,14 +6,22 @@ import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore
 import { useRouter, useSearchParams } from 'next/navigation';
 import './EditItemForm.scss';
 
-const EditItemForm = () => {
+interface ItemData {
+    fileUrl: string;
+    category: string;
+    rating: number;
+    id: number;
+    createdAt: any; // Firestore timestamp, we will convert it later
+}
+
+const EditItemForm: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const id = parseInt(searchParams.get('id'), 10);
+    const id = parseInt(searchParams.get('id') || '', 10);
 
-    const [itemData, setItemData] = useState(null);
-    const [sliderValue, setSliderValue] = useState(50);
-    const [updating, setUpdating] = useState(false);
+    const [itemData, setItemData] = useState<ItemData | null>(null);
+    const [sliderValue, setSliderValue] = useState<number>(50);
+    const [updating, setUpdating] = useState<boolean>(false);
 
     useEffect(() => {
         if (id) {
@@ -23,7 +31,7 @@ const EditItemForm = () => {
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
                     const doc = querySnapshot.docs[0];
-                    const data = doc.data();
+                    const data = doc.data() as ItemData;
                     setItemData(data);
                     setSliderValue(data.rating); // Initialize slider with current rating
                 } else {
@@ -34,11 +42,11 @@ const EditItemForm = () => {
         }
     }, [id]);
 
-    const handleSliderChange = (e) => {
-        setSliderValue(e.target.value);
+    const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSliderValue(parseInt(e.target.value, 10));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setUpdating(true);
 
@@ -53,7 +61,7 @@ const EditItemForm = () => {
                 });
 
                 alert('Slider value updated successfully!');
-                router.push('/voting'); // Redirect to home page after update
+                router.push('/voting'); // Redirect to voting page after update
             } else {
                 console.error('No such document!');
             }
