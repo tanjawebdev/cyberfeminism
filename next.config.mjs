@@ -6,7 +6,13 @@ const nextConfig = {
         includePaths: [path.join(process.cwd(), 'styles')],
     },
     images: {
-        domains: ['firebasestorage.googleapis.com'],
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'firebasestorage.googleapis.com',
+                pathname: '/**',
+            },
+        ],
     },
 };
 
