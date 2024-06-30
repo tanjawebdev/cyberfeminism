@@ -2,4 +2,4 @@ $enable-grid-classes: false;
 $enable-cssgrid: true;
 
 @import "./styles/variables.module.scss";
-@import "~bootstrap/scss/bootstrap";
+@import "bootstrap";
