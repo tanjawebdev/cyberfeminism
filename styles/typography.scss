@@ -1,0 +1,12 @@
+// Fonts
+:root {
+  --bs-font-sans-serif: var(--font-geist-sans);
+}
+
+$font-sans-serif: var(--font-geist-sans) !default;
+
+h1 {
+  font-family: "proxima-sera", serif;
+  font-weight: 300;
+  font-style: normal;
+}

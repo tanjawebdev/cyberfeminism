@@ -1,5 +1,6 @@
 $enable-grid-classes: false;
 $enable-cssgrid: true;
 
-@import "./styles/variables.module.scss";
+@import "@styles/variables.module.scss";
 @import "bootstrap";
+@import "@styles/typography.scss";

@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import type { Viewport } from 'next'
-import { Inter } from "next/font/google";
+import { GeistSans } from 'geist/font/sans';
 import "@styles/globals.scss";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Cyberfeminism",
@@ -34,8 +32,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+      <html lang="en" className={GeistSans.variable}>
+      <head>
+        <link rel="stylesheet" href="https://use.typekit.net/str2hdb.css"/>
+      </head>
       <body>{children}</body>
-    </html>
+      </html>
   )
 }
