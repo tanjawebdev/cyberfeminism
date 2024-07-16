@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from "next/image";
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, getDocs, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import "@styles/home.scss";
 import InfoModal from "@components/infoModal/InfoModal";
@@ -12,23 +12,32 @@ interface UploadedItem {
     fileUrl: string;
     category: string;
     rating: number;
+    individualRating: number;
     id: number;
     createdAt: Date;
+    editedAt: Date;
+    sortDate: Date;
     allRatings: number[];
+}
+
+interface CategoryData {
+    id: string;
+    categoryName: string;
 }
 
 export default function Home() {
     const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [isHomeModalOpen, setHomeModalOpen] = useState<boolean>(false);
+    const [categories, setCategories] = useState<CategoryData[]>([]);
 
     const fetchItems = (category: string | null) => {
         const itemsRef = collection(db, 'items');
         let q;
         if (category) {
-            q = query(itemsRef, where('category', '==', category), orderBy('createdAt', 'desc'));
+            q = query(itemsRef, where('category', '==', category), orderBy('sortDate', 'desc'));
         } else {
-            q = query(itemsRef, orderBy('createdAt', 'desc'));
+            q = query(itemsRef, orderBy('sortDate', 'desc'));
         }
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -36,7 +45,7 @@ export default function Home() {
                 const data = doc.data();
                 return {
                     ...data,
-                    createdAt: data.createdAt.toDate(),
+                    sortDate: data.sortDate?.toDate(),
                 } as UploadedItem;
             });
             setUploadedItems(items);
@@ -50,6 +59,20 @@ export default function Home() {
         return () => unsubscribe();
     }, [selectedCategory]);
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const categoriesRef = collection(db, 'categories');
+            const categorySnapshot = await getDocs(categoriesRef);
+            const categories: CategoryData[] = categorySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                categoryName: doc.data().categoryName,
+            }));
+            setCategories(categories);
+        };
+
+        fetchCategories();
+    }, []);
+
     const handleCategoryClick = (category: string | null) => {
         setSelectedCategory(category);
     };
@@ -60,6 +83,11 @@ export default function Home() {
 
     const handleCloseHomeModal = () => {
         setHomeModalOpen(false);
+    };
+
+    const getCategoryName = (categoryId: string): string => {
+        const category = categories.find(cat => cat.id === categoryId);
+        return category ? category.categoryName : 'Unknown';
     };
 
     return (
@@ -79,18 +107,23 @@ export default function Home() {
                                 height={200}
                             />
                             <p>Category: {item.category}</p>
+                            <p>Category Name: {getCategoryName(item.category)}</p>
                             <p>Rating: {item.rating}</p>
+                            <p>Individual Rating: {item.individualRating}</p>
                             <p>Number of Ratings: {item.allRatings.length}</p>
                             <p>ID: {item.id}</p>
-                            <p>Created: {item.createdAt.toLocaleString()}</p>
+                            <p>Sort Date: {item.sortDate?.toLocaleDateString()}</p>
                         </div>
                     ))}
                 </div>
                 <div className="home__buttons grid">
                     <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick(null)}>All</div>
-                    <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick('option1')}>Movies</div>
-                    <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick('option2')}>Memes</div>
-                    <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick('option3')}>Books</div>
+                    {categories.map((category) => (
+                        <div key={category.id} className="btn btn-secondary g-col"
+                             onClick={() => handleCategoryClick(category.id)}>
+                            {category.categoryName}
+                        </div>
+                    ))}
                 </div>
 
                 <HomeModal isOpen={isHomeModalOpen} onClose={handleCloseHomeModal}/>

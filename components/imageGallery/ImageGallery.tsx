@@ -12,10 +12,17 @@ interface UploadedItem {
     rating: number;
     id: number;
     createdAt: any;
+    sortDate: Date;
+}
+
+interface CategoryData {
+    id: string;
+    categoryName: string;
 }
 
 const ImageGallery: React.FC = () => {
     const [latestItems, setLatestItems] = useState<UploadedItem[]>([]);
+    const [categories, setCategories] = useState<CategoryData[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const router = useRouter();
 
@@ -23,9 +30,9 @@ const ImageGallery: React.FC = () => {
         const itemsRef = collection(db, 'items');
         let q;
         if (category) {
-            q = query(itemsRef, where('category', '==', category), orderBy('createdAt', 'desc'), limit(5));
+            q = query(itemsRef, where('category', '==', category), orderBy('sortDate', 'desc'), limit(5));
         } else {
-            q = query(itemsRef, orderBy('createdAt', 'desc'), limit(5));
+            q = query(itemsRef, orderBy('sortDate', 'desc'), limit(5));
         }
         const querySnapshot = await getDocs(q);
         const items = querySnapshot.docs.map((doc) => {
@@ -35,8 +42,19 @@ const ImageGallery: React.FC = () => {
         setLatestItems(items);
     };
 
+    const fetchCategories = async () => {
+        const categoriesRef = collection(db, 'categories');
+        const categorySnapshot = await getDocs(categoriesRef);
+        const categoriesData = categorySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+        })) as CategoryData[];
+        setCategories(categoriesData);
+    };
+
     useEffect(() => {
         fetchLatestItems();
+        fetchCategories();
     }, []);
 
     const handleImageClick = (id: number) => {
@@ -54,6 +72,7 @@ const ImageGallery: React.FC = () => {
                 <div className="grid">
                     {latestItems.map((item) => (
                         <div key={item.id} className="g-col" onClick={() => handleImageClick(item.id)}>
+                            {item.rating}% sexist
                             <div className="imageGallery__image">
                                 <img src={item.fileUrl} alt={`Item ${item.id}`} className="galleryImage" />
                             </div>
@@ -64,9 +83,11 @@ const ImageGallery: React.FC = () => {
             <div className="categories">
                 <div className="grid">
                     <div className="g-col" onClick={() => handleCategoryClick(null)}>All</div>
-                    <div className="g-col" onClick={() => handleCategoryClick('option1')}>Movies</div>
-                    <div className="g-col" onClick={() => handleCategoryClick('option2')}>Memes</div>
-                    <div className="g-col" onClick={() => handleCategoryClick('option3')}>Books</div>
+                    {categories.map((category) => (
+                        <div key={category.id} className="g-col" onClick={() => handleCategoryClick(category.id)}>
+                            {category.categoryName}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

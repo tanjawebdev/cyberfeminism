@@ -1,15 +1,22 @@
 'use client';
 
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, {useState, ChangeEvent, FormEvent, useEffect} from 'react';
 import { storage, db } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, doc, runTransaction } from 'firebase/firestore';
+import {collection, doc, runTransaction, getDoc, getDocs} from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-
 import './NewItemForm.scss';
 
 interface FileType extends File {
     name: string;
+}
+
+interface CategoryData {
+    id: string;
+    categoryName: string;
+    individualSliderHeadline: string;
+    individualSliderMinTitle: string;
+    individualSliderMaxTitle: string;
 }
 
 const NewItemForm: React.FC = () => {
@@ -17,7 +24,24 @@ const NewItemForm: React.FC = () => {
     const [file, setFile] = useState<FileType | null>(null);
     const [dropdownValue, setDropdownValue] = useState<string>('');
     const [sliderValue, setSliderValue] = useState<number>(50);
+    const [individualSliderValue, setIndividualSliderValue] = useState<number>(50);
     const [uploading, setUploading] = useState<boolean>(false);
+    const [categories, setCategories] = useState<CategoryData[]>([]);
+    const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const categoriesRef = collection(db, 'categories');
+            const categorySnapshot = await getDocs(categoriesRef);
+            const categoriesData = categorySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            })) as CategoryData[];
+            setCategories(categoriesData);
+        };
+
+        fetchCategories();
+    }, []);
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -25,12 +49,25 @@ const NewItemForm: React.FC = () => {
         }
     };
 
-    const handleDropdownChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        setDropdownValue(e.target.value);
+    const handleDropdownChange = async (e: ChangeEvent<HTMLSelectElement>) => {
+        const selectedCategory = e.target.value;
+        setDropdownValue(selectedCategory);
+
+        const categoryDocRef = doc(db, 'categories', selectedCategory);
+        const categoryDoc = await getDoc(categoryDocRef);
+        if (categoryDoc.exists()) {
+            setCategoryData(categoryDoc.data() as CategoryData);
+        } else {
+            console.error('No such category document!');
+        }
     };
 
     const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSliderValue(parseInt(e.target.value, 10));
+    };
+
+    const handleIndividualSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setIndividualSliderValue(parseInt(e.target.value, 10));
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -65,8 +102,11 @@ const NewItemForm: React.FC = () => {
                     fileUrl,
                     category: dropdownValue,
                     rating: sliderValue,
+                    individualRating: individualSliderValue,
                     createdAt: new Date(),
+                    sortDate: new Date(),
                     allRatings: [sliderValue],
+                    allIndividualRatings: [individualSliderValue],
                 });
             });
 
@@ -80,6 +120,7 @@ const NewItemForm: React.FC = () => {
             setFile(null);
             setDropdownValue('');
             setSliderValue(50);
+            setIndividualSliderValue(50);
         }
     };
 
@@ -101,9 +142,11 @@ const NewItemForm: React.FC = () => {
                     <option value="" disabled>
                         Select an option
                     </option>
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
+                    {categories.map(category => (
+                        <option key={category.id} value={category.id}>
+                            {category.categoryName}
+                        </option>
+                    ))}
                 </select>
             </div>
 
@@ -119,6 +162,27 @@ const NewItemForm: React.FC = () => {
                 />
                 <span>{sliderValue}</span>
             </div>
+
+            {categoryData && (
+                <>
+                <div className="form-group">
+                    <label htmlFor="individual-slider">{categoryData?.individualSliderHeadline}:</label>
+                    <input
+                        type="range"
+                        id="individual-slider"
+                        min="0"
+                        max="100"
+                        value={individualSliderValue}
+                        onChange={handleIndividualSliderChange}
+                    />
+                    <div className="slider-titles">
+                        <span>{categoryData?.individualSliderMinTitle}</span>
+                        <span>{categoryData?.individualSliderMaxTitle}</span>
+                    </div>
+                    <span>{individualSliderValue}</span>
+                </div>
+                </>
+            )}
 
             <button type="submit" disabled={uploading}>
                 {uploading ? 'Uploading...' : 'Submit'}
