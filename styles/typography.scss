@@ -1,6 +1,8 @@
 // Fonts
 :root {
   --bs-font-sans-serif: var(--font-geist-sans);
+  --bs-body-font-weight: 300;
+  --bs-body-font-size: 15px;
 }
 
 $font-sans-serif: var(--font-geist-sans) !default;

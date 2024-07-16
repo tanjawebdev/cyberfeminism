@@ -33,7 +33,8 @@ export default function VotingHome() {
 
     return (
         <main className="voting">
-            <h1>Rate me</h1>
+            <h1>Ra(n)ting Now</h1>
+            <span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut</span>
 
             <ImageGallery />
 
