@@ -1,10 +1,11 @@
 'use client';
 
-import React, {useState, ChangeEvent, FormEvent, useEffect} from 'react';
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { storage, db } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import {collection, doc, runTransaction, getDoc, getDocs} from 'firebase/firestore';
+import { collection, doc, runTransaction, getDoc, getDocs } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import leven from 'leven';
 import './NewItemForm.scss';
 
 interface FileType extends File {
@@ -21,6 +22,7 @@ interface CategoryData {
 
 const NewItemForm: React.FC = () => {
     const router = useRouter();
+    const [name, setName] = useState<string>('');
     const [file, setFile] = useState<FileType | null>(null);
     const [dropdownValue, setDropdownValue] = useState<string>('');
     const [sliderValue, setSliderValue] = useState<number>(50);
@@ -28,9 +30,11 @@ const NewItemForm: React.FC = () => {
     const [uploading, setUploading] = useState<boolean>(false);
     const [categories, setCategories] = useState<CategoryData[]>([]);
     const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
+    const [existingNames, setExistingNames] = useState<string[]>([]);
+    const [closestMatch, setClosestMatch] = useState<string>('');
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchCategoriesAndNames = async () => {
             const categoriesRef = collection(db, 'categories');
             const categorySnapshot = await getDocs(categoriesRef);
             const categoriesData = categorySnapshot.docs.map(doc => ({
@@ -38,9 +42,16 @@ const NewItemForm: React.FC = () => {
                 ...doc.data(),
             })) as CategoryData[];
             setCategories(categoriesData);
+
+            const itemsRef = collection(db, 'items');
+            const itemsSnapshot = await getDocs(itemsRef);
+            const itemNames = itemsSnapshot.docs
+                .map(doc => doc.data().name)
+                .filter(name => name) as string[];
+            setExistingNames(itemNames);
         };
 
-        fetchCategories();
+        fetchCategoriesAndNames();
     }, []);
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -66,6 +77,20 @@ const NewItemForm: React.FC = () => {
         setSliderValue(parseInt(e.target.value, 10));
     };
 
+    const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const newName = e.target.value;
+        setName(newName);
+
+        if (newName && existingNames.length > 0) {
+            const closest = existingNames.reduce((a, b) =>
+                leven(newName, a) < leven(newName, b) ? a : b
+            );
+            setClosestMatch(leven(newName, closest) <= 3 ? closest : '');
+        } else {
+            setClosestMatch('');
+        }
+    };
+
     const handleIndividualSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
         setIndividualSliderValue(parseInt(e.target.value, 10));
     };
@@ -74,6 +99,11 @@ const NewItemForm: React.FC = () => {
         e.preventDefault();
         if (!file) {
             alert('Please upload a file.');
+            return;
+        }
+
+        if (!name) {
+            alert('Please enter a name.');
             return;
         }
 
@@ -99,6 +129,7 @@ const NewItemForm: React.FC = () => {
                 const newItemRef = doc(collection(db, 'items'));
                 transaction.set(newItemRef, {
                     id: newId,
+                    name,
                     fileUrl,
                     category: dropdownValue,
                     rating: sliderValue,
@@ -118,6 +149,7 @@ const NewItemForm: React.FC = () => {
         } finally {
             setUploading(false);
             setFile(null);
+            setName('');
             setDropdownValue('');
             setSliderValue(50);
             setIndividualSliderValue(50);
@@ -126,6 +158,23 @@ const NewItemForm: React.FC = () => {
 
     return (
         <form onSubmit={handleSubmit}>
+            <div className="form-group">
+                <label htmlFor="name">Name:</label>
+                <input
+                    type="text"
+                    id="name"
+                    value={name}
+                    onChange={handleNameChange}
+                    required
+                />
+                {closestMatch && (
+                    <p className="closest-match">
+                         An item with name <strong>&quot;{closestMatch}&quot;</strong> is already existing. <br/>
+                        Edit Existing. Continue with new Item. Quit.
+                    </p>
+                )}
+            </div>
+
             <div className="form-group">
                 <label htmlFor="file-upload">Upload Image:</label>
                 <input
@@ -164,7 +213,6 @@ const NewItemForm: React.FC = () => {
             </div>
 
             {categoryData && (
-                <>
                 <div className="form-group">
                     <label htmlFor="individual-slider">{categoryData?.individualSliderHeadline}:</label>
                     <input
@@ -181,7 +229,6 @@ const NewItemForm: React.FC = () => {
                     </div>
                     <span>{individualSliderValue}</span>
                 </div>
-                </>
             )}
 
             <button type="submit" disabled={uploading}>
