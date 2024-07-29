@@ -1,4 +1,19 @@
 // Fonts
+
+@font-face {
+  font-family: 'NeueMetana';
+  src: url('../public/fonts/NeueMetana-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NeueMetana';
+  src: url('../public/fonts/NeueMetana-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
 :root {
   --bs-font-sans-serif: var(--font-geist-sans);
   --bs-body-font-weight: 300;
@@ -8,7 +23,7 @@
 $font-sans-serif: var(--font-geist-sans) !default;
 
 h1 {
-  font-family: "proxima-sera", serif;
-  font-weight: 300;
+  font-family: "NeueMetana", sans-serif;
+  font-weight: bold;
   font-style: normal;
 }

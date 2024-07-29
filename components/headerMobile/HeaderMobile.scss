@@ -1,0 +1,39 @@
+/* components/headerMobile/HeaderMobile.scss */
+
+.header {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  .back-button {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    svg {
+      margin-right: 0.5rem;
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 2 / 3;
+
+    img {
+      height: 50px;
+    }
+  }
+}

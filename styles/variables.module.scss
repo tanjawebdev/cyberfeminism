@@ -3,8 +3,8 @@ $body-bg: #121212;
 $body-color: #e0e0e0;
 
 // Colors
-$primary: #bb86fc;
-$secondary: #03dac6;
+$primary: #ffffff;
+$secondary: #202020;
 $success: #00e676;
 $info: #2196f3;
 $warning: #ffab00;
@@ -25,14 +25,15 @@ $enable-cssgrid: true;
 // Borders
 $border-color: #333;
 $border-width: 1px;
-$border-radius: 0.25rem;
-$border-radius-lg: 0.3rem;
-$border-radius-sm: 0.2rem;
+$border-radius: 2rem;
+$border-radius-lg: 2rem;
+$border-radius-sm: 2rem;
 
 // Buttons
+$btn-font-size: 13px;
 $btn-padding-y: 0.375rem;
 $btn-padding-x: 0.75rem;
-$btn-font-weight: 400;
+$btn-font-weight: 500;
 $btn-box-shadow: none;
 $btn-primary-bg: $primary;
 $btn-primary-border: $primary;
@@ -42,6 +43,7 @@ $btn-secondary-bg: $secondary;
 $btn-secondary-border: $secondary;
 $btn-secondary-hover-bg: darken($secondary, 10%);
 $btn-secondary-hover-border: darken($secondary, 10%);
+
 
 // Forms
 $form-control-bg: #333;

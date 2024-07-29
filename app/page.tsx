@@ -5,7 +5,6 @@ import Image from "next/image";
 import { collection, query, where, orderBy, onSnapshot, getDocs, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import "@styles/home.scss";
-import InfoModal from "@components/infoModal/InfoModal";
 import HomeModal from "@components/homeModal/HomeModal";
 
 interface UploadedItem {

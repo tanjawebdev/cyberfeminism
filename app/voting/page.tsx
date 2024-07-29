@@ -33,12 +33,14 @@ export default function VotingHome() {
 
     return (
         <main className="voting">
-            <h1>Ra(n)ting Now</h1>
-            <span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut</span>
+            <div className="voting__header">
+                <h1>Ra(n)ting Now</h1>
+                <span>Be the change: Rate media based on feminist principles. Your opinion matters!</span>
+            </div>
 
             <ImageGallery />
 
-            <div className="buttons">
+            <div className="voting__buttons">
                 <button className="btn btn-secondary add-new" onClick={handleAddNewClick}>Add New</button>
                 <button className="btn btn-primary" onClick={handleOpenChangeModal}>Change existing</button>
                 <button className="btn btn-primary" onClick={handleOpenInfoModal}>Show installation</button>
