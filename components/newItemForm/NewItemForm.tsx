@@ -115,6 +115,13 @@ const NewItemForm: React.FC = () => {
             await uploadBytes(fileRef, file);
             const fileUrl = await getDownloadURL(fileRef);
 
+            const resizedFileName = file.name.replace(/\.[^/.]+$/, "") + "_350x350.webp";
+            const resizedFileRef = ref(storage, `uploads/${resizedFileName}`);
+
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            const resizedFileUrl = await getDownloadURL(resizedFileRef);
+
+
             // Transaction to update counter and add new item
             await runTransaction(db, async (transaction) => {
                 const counterDocRef = doc(db, 'counters', 'itemCounter');
@@ -130,7 +137,7 @@ const NewItemForm: React.FC = () => {
                 transaction.set(newItemRef, {
                     id: newId,
                     name,
-                    fileUrl,
+                    fileUrl: resizedFileUrl,
                     category: dropdownValue,
                     rating: sliderValue,
                     individualRating: individualSliderValue,

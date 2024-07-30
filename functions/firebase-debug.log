@@ -1,0 +1,109 @@
+[debug] [2024-07-30T12:46:45.647Z] ----------------------------------------------------------------------
+[debug] [2024-07-30T12:46:45.652Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy --only functions
+[debug] [2024-07-30T12:46:45.652Z] CLI Version:   13.14.2
+[debug] [2024-07-30T12:46:45.653Z] Platform:      darwin
+[debug] [2024-07-30T12:46:45.653Z] Node Version:  v20.10.0
+[debug] [2024-07-30T12:46:45.653Z] Time:          Tue Jul 30 2024 14:46:45 GMT+0200 (Central European Summer Time)
+[debug] [2024-07-30T12:46:45.653Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-07-30T12:46:45.690Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-07-30T12:46:45.690Z] > authorizing via signed-in user (kobler.tanja@gmail.com)
+[debug] [2024-07-30T12:46:45.690Z] [iam] checking project cyberfeminism for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2024-07-30T12:46:45.691Z] > refreshing access token with scopes: []
+[debug] [2024-07-30T12:46:45.692Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2024-07-30T12:46:45.692Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-07-30T12:46:45.845Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2024-07-30T12:46:45.846Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-07-30T12:46:45.876Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/cyberfeminism:testIamPermissions [none]
+[debug] [2024-07-30T12:46:45.877Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/cyberfeminism:testIamPermissions x-goog-quota-user=projects/cyberfeminism
+[debug] [2024-07-30T12:46:45.877Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cyberfeminism:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2024-07-30T12:46:46.645Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/cyberfeminism:testIamPermissions 200
+[debug] [2024-07-30T12:46:46.645Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cyberfeminism:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2024-07-30T12:46:46.646Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/cyberfeminism/serviceAccounts/cyberfeminism@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2024-07-30T12:46:46.646Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/cyberfeminism/serviceAccounts/cyberfeminism@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2024-07-30T12:46:47.508Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/cyberfeminism/serviceAccounts/cyberfeminism@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2024-07-30T12:46:47.509Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/cyberfeminism/serviceAccounts/cyberfeminism@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'cyberfeminism'...
+[info] 
+[info] i  deploying functions 
+[info] Running command: npm --prefix "$RESOURCE_DIR" run build
+[info] ✔  functions: Finished running predeploy script. 
+[debug] [2024-07-30T12:46:50.743Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/cyberfeminism [none]
+[debug] [2024-07-30T12:46:51.283Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/cyberfeminism 200
+[debug] [2024-07-30T12:46:51.284Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/cyberfeminism {"projectId":"cyberfeminism","projectNumber":"837718669527","displayName":"Cyberfeminism","name":"projects/cyberfeminism","resources":{"hostingSite":"cyberfeminism","realtimeDatabaseInstance":"cyberfeminism-default-rtdb","storageBucket":"cyberfeminism.appspot.com","locationId":"europe-central2"},"state":"ACTIVE","etag":"1_d2d4da2b-aeae-4da7-a056-ef432b224c3b"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2024-07-30T12:46:51.286Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/cloudfunctions.googleapis.com [none]
+[debug] [2024-07-30T12:46:51.286Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/cyberfeminism
+[debug] [2024-07-30T12:46:51.288Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/runtimeconfig.googleapis.com [none]
+[debug] [2024-07-30T12:46:51.288Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/cyberfeminism
+[debug] [2024-07-30T12:46:51.289Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/cloudbuild.googleapis.com [none]
+[debug] [2024-07-30T12:46:51.289Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/cloudbuild.googleapis.com x-goog-quota-user=projects/cyberfeminism
+[debug] [2024-07-30T12:46:51.290Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/artifactregistry.googleapis.com [none]
+[debug] [2024-07-30T12:46:51.290Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/artifactregistry.googleapis.com x-goog-quota-user=projects/cyberfeminism
+[debug] [2024-07-30T12:46:52.303Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/runtimeconfig.googleapis.com 200
+[debug] [2024-07-30T12:46:52.303Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2024-07-30T12:46:52.304Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/cloudbuild.googleapis.com 200
+[debug] [2024-07-30T12:46:52.304Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/cloudbuild.googleapis.com [omitted]
+[info] ✔  functions: required API cloudbuild.googleapis.com is enabled 
+[debug] [2024-07-30T12:46:52.305Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/cloudfunctions.googleapis.com 200
+[debug] [2024-07-30T12:46:52.306Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/cloudfunctions.googleapis.com [omitted]
+[info] ✔  functions: required API cloudfunctions.googleapis.com is enabled 
+[debug] [2024-07-30T12:46:52.316Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/artifactregistry.googleapis.com 200
+[debug] [2024-07-30T12:46:52.316Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/cyberfeminism/services/artifactregistry.googleapis.com [omitted]
+[info] ✔  artifactregistry: required API artifactregistry.googleapis.com is enabled 
+[debug] [2024-07-30T12:46:52.317Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/cyberfeminism/adminSdkConfig [none]
+[debug] [2024-07-30T12:46:53.032Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/cyberfeminism/adminSdkConfig 200
+[debug] [2024-07-30T12:46:53.032Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/cyberfeminism/adminSdkConfig {"projectId":"cyberfeminism","databaseURL":"https://cyberfeminism-default-rtdb.europe-west1.firebasedatabase.app","storageBucket":"cyberfeminism.appspot.com","locationId":"europe-central2"}
+[debug] [2024-07-30T12:46:53.033Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/cyberfeminism/configs [none]
+[debug] [2024-07-30T12:46:53.320Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/cyberfeminism/configs 200
+[debug] [2024-07-30T12:46:53.320Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/cyberfeminism/configs {}
+[debug] [2024-07-30T12:46:53.323Z] Validating nodejs source
+[debug] [2024-07-30T12:46:53.695Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^12.3.0",
+    "firebase-functions": "^5.0.0",
+    "sharp": "^0.33.4"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0",
+    "typescript": "^4.9.0"
+  },
+  "private": true
+}
+[debug] [2024-07-30T12:46:53.696Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2024-07-30T12:46:53.696Z] Could not find functions.yaml. Must use http discovery
+[debug] [2024-07-30T12:46:53.701Z] Found firebase-functions binary at '/Users/tanja/Documents/react-app/cyberfeminism/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8923
+
+[debug] [2024-07-30T12:46:53.831Z] Got response from /__/functions.yaml {"endpoints":{},"specVersion":"v1alpha1","requiredAPIs":[]}
+[debug] [2024-07-30T12:46:58.855Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/cyberfeminism/locations/-/functions [none]
+[debug] [2024-07-30T12:46:59.591Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/cyberfeminism/locations/-/functions 200
+[debug] [2024-07-30T12:46:59.592Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/cyberfeminism/locations/-/functions {"functions":[{"name":"projects/cyberfeminism/locations/europe-west3/functions/ext-storage-resize-images-backfillResizedImages","description":"Handles tasks from startBackfill to resize existing images.","sourceArchiveUrl":"gs://firebase-mod-sources-prod/91d70c5760516affc661569f4e585b71e097fe3b590e4a206c2f2613929e1f94","httpsTrigger":{"url":"https://europe-west3-cyberfeminism.cloudfunctions.net/ext-storage-resize-images-backfillResizedImages","securityLevel":"SECURE_OPTIONAL"},"status":"ACTIVE","entryPoint":"backfillResizedImages","timeout":"540s","availableMemoryMb":1024,"serviceAccountEmail":"ext-storage-resize-images@cyberfeminism.iam.gserviceaccount.com","updateTime":"2024-07-30T12:06:44.703Z","versionId":"2","labels":{"goog-firebase-ext":"storage-resize-images","deployment-tool":"firebase-extensions","goog-firebase-ext-iid":"storage-resize-images","firebase-extensions-ar":"enabled","goog-dm":"firebase-ext-storage-resize-images"},"environmentVariables":{"DATABASE_INSTANCE":"cyberfeminism-default-rtdb","DATABASE_URL":"https://cyberfeminism-default-rtdb.europe-west1.firebasedatabase.app","DELETE_ORIGINAL_FILE":"false","DO_BACKFILL":"true","EXT_INSTANCE_ID":"storage-resize-images","FIREBASE_CONFIG":"{\"projectId\":\"cyberfeminism\",\"databaseURL\":\"https://cyberfeminism-default-rtdb.europe-west1.firebasedatabase.app\",\"storageBucket\":\"cyberfeminism.appspot.com\"}","FUNCTION_MEMORY":"1024","GCLOUD_PROJECT":"cyberfeminism","IMAGE_TYPE":"webp","IMG_BUCKET":"cyberfeminism.appspot.com","IMG_SIZES":"350x350","INCLUDE_PATH_LIST":"/uploads","IS_ANIMATED":"true","LOCATION":"europe-west3","MAKE_PUBLIC":"false","PROJECT_ID":"cyberfeminism","REGENERATE_TOKEN":"true","SHARP_OPTIONS":"{ \"fit\": \"inside\" }","STORAGE_BUCKET":"cyberfeminism.appspot.com"},"runtime":"nodejs18","ingressSettings":"ALLOW_ALL","buildId":"f6afdc10-f4e3-4839-9aa1-527fdf131115","buildEnvironmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"buildName":"projects/837718669527/locations/europe-west3/builds/f6afdc10-f4e3-4839-9aa1-527fdf131115","dockerRegistry":"ARTIFACT_REGISTRY","automaticUpdatePolicy":{}},{"name":"projects/cyberfeminism/locations/europe-west3/functions/ext-storage-resize-images-generateResizedImage","description":"Listens for new images uploaded to your specified Cloud Storage bucket, resizes the images, then stores the resized images in the same bucket. Optionally keeps or deletes the original images.","sourceArchiveUrl":"gs://firebase-mod-sources-prod/91d70c5760516affc661569f4e585b71e097fe3b590e4a206c2f2613929e1f94","eventTrigger":{"eventType":"google.storage.object.finalize","resource":"projects/_/buckets/cyberfeminism.appspot.com","service":"storage.googleapis.com","failurePolicy":{}},"status":"ACTIVE","entryPoint":"generateResizedImage","timeout":"60s","availableMemoryMb":1024,"serviceAccountEmail":"ext-storage-resize-images@cyberfeminism.iam.gserviceaccount.com","updateTime":"2024-07-30T12:06:49.838Z","versionId":"2","labels":{"firebase-extensions-ar":"enabled","goog-dm":"firebase-ext-storage-resize-images","goog-firebase-ext":"storage-resize-images","deployment-tool":"firebase-extensions","goog-firebase-ext-iid":"storage-resize-images"},"environmentVariables":{"DATABASE_INSTANCE":"cyberfeminism-default-rtdb","DATABASE_URL":"https://cyberfeminism-default-rtdb.europe-west1.firebasedatabase.app","DELETE_ORIGINAL_FILE":"false","DO_BACKFILL":"true","EXT_INSTANCE_ID":"storage-resize-images","FIREBASE_CONFIG":"{\"projectId\":\"cyberfeminism\",\"databaseURL\":\"https://cyberfeminism-default-rtdb.europe-west1.firebasedatabase.app\",\"storageBucket\":\"cyberfeminism.appspot.com\"}","FUNCTION_MEMORY":"1024","GCLOUD_PROJECT":"cyberfeminism","IMAGE_TYPE":"webp","IMG_BUCKET":"cyberfeminism.appspot.com","IMG_SIZES":"350x350","INCLUDE_PATH_LIST":"/uploads","IS_ANIMATED":"true","LOCATION":"europe-west3","MAKE_PUBLIC":"false","PROJECT_ID":"cyberfeminism","REGENERATE_TOKEN":"true","SHARP_OPTIONS":"{ \"fit\": \"inside\" }","STORAGE_BUCKET":"cyberfeminism.appspot.com"},"runtime":"nodejs18","maxInstances":3000,"ingressSettings":"ALLOW_INTERNAL_ONLY","buildId":"190b4c74-a3b6-4c5f-88bf-1ef17b076bdf","buildEnvironmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"buildName":"projects/837718669527/locations/europe-west3/builds/190b4c74-a3b6-4c5f-88bf-1ef17b076bdf","dockerRegistry":"ARTIFACT_REGISTRY","automaticUpdatePolicy":{}},{"name":"projects/cyberfeminism/locations/us-central1/functions/resizeImage","eventTrigger":{"eventType":"google.storage.object.finalize","resource":"projects/_/buckets/cyberfeminism.appspot.com","service":"storage.googleapis.com","failurePolicy":{}},"status":"UNKNOWN","entryPoint":"resizeImage","timeout":"60s","availableMemoryMb":256,"serviceAccountEmail":"cyberfeminism@appspot.gserviceaccount.com","updateTime":"2024-07-30T11:19:58.771Z","versionId":"1","labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"175c7200c32a0ff8a776398919342a08b57574e5"},"sourceUploadUrl":"https://storage.googleapis.com/uploads-120296686874.us-central1.cloudfunctions.appspot.com/414ef2c1-f4de-46ab-aabb-f2b010c80697.zip","environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"cyberfeminism\",\"databaseURL\":\"https://cyberfeminism-default-rtdb.europe-west1.firebasedatabase.app\",\"storageBucket\":\"cyberfeminism.appspot.com\",\"locationId\":\"europe-central2\"}","GCLOUD_PROJECT":"cyberfeminism","EVENTARC_CLOUD_EVENT_SOURCE":"projects/cyberfeminism/locations/us-central1/functions/resizeImage"},"runtime":"nodejs18","maxInstances":3000,"ingressSettings":"ALLOW_ALL","buildId":"0abd4b7c-d3e6-4d74-8a00-cc6a2971d5f8","buildEnvironmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"buildName":"projects/837718669527/locations/us-central1/builds/0abd4b7c-d3e6-4d74-8a00-cc6a2971d5f8","dockerRegistry":"ARTIFACT_REGISTRY","automaticUpdatePolicy":{}}]}
+[debug] [2024-07-30T12:46:59.595Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/cyberfeminism/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2024-07-30T12:47:00.621Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/cyberfeminism/locations/-/functions 200
+[debug] [2024-07-30T12:47:00.621Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/cyberfeminism/locations/-/functions {}
+[info] 
+The following functions are found in your project but do not exist in your local source code:
+	resizeImage(us-central1)
+
+If you are renaming a function or changing its region, it is recommended that you create the new function first before deleting the old one to prevent event loss. For more info, visit https://firebase.google.com/docs/functions/manage-functions#modify
+

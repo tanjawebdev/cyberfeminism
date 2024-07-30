@@ -1,0 +1,36 @@
+@import "variables.module.scss";
+
+.voting__buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .voting__changebuttons {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1rem;
+
+    .btn {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    svg {
+      border: 1px solid #333333;
+      border-radius: 50%;
+      font-size: 6rem;
+      padding: 1.25rem;
+    }
+
+    .edit-item svg {
+      padding: 1.5rem;
+    }
+  }
+
+  .show-install {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+}

@@ -1,7 +1,27 @@
-.galleryImage {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+.image-gallery {
+  margin-bottom: 2rem;
+
+  .image-gallery__gallery-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .categories {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: .75rem;
+    padding-block: 1rem;
+    padding-inline: 1rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    .btn {
+      margin: 0;
+      white-space: nowrap;
+    }
+  }
 }

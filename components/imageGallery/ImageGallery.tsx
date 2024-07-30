@@ -67,28 +67,27 @@ const ImageGallery: React.FC = () => {
     };
 
     return (
-        <div className="imageGallery">
+        <div className="image-gallery">
             <div className="container">
+                   <span className="image-gallery__rating">⌀ Rating:</span>
                 <div className="grid">
                     {latestItems.map((item) => (
                         <div key={item.id} className="g-col" onClick={() => handleImageClick(item.id)}>
-                            {item.rating}% sexist
-                            <div className="imageGallery__image">
-                                <img src={item.fileUrl} alt={`Item ${item.id}`} className="galleryImage" />
+                            <div className="image-gallery__image">
+                                <img src={item.fileUrl} alt={`Item ${item.id}`} className="image-gallery__gallery-image" />
                             </div>
+                            {item.rating}% sexist
                         </div>
                     ))}
                 </div>
             </div>
             <div className="categories">
-                <div className="grid">
-                    <div className="g-col" onClick={() => handleCategoryClick(null)}>All</div>
-                    {categories.map((category) => (
-                        <div key={category.id} className="g-col" onClick={() => handleCategoryClick(category.id)}>
-                            {category.categoryName}
-                        </div>
-                    ))}
-                </div>
+                <button className="btn btn-primary" onClick={() => handleCategoryClick(null)}>Latest</button>
+                {categories.map((category) => (
+                    <button key={category.id} className="btn btn-secondary" onClick={() => handleCategoryClick(category.id)}>
+                        {category.categoryName}
+                    </button>
+                ))}
             </div>
         </div>
     );

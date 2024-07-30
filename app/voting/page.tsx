@@ -1,10 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ChangeItemModal from '@components/changeItemModal/ChangeItemModal';
 import InfoModal from '@components/infoModal/InfoModal';
 import ImageGallery from '@components/imageGallery/ImageGallery';
+import { PiPencilSimpleThin } from "react-icons/pi";
+import { PiPlusThin } from "react-icons/pi";
+
+
 
 export default function VotingHome() {
     const [isChangeModalOpen, setChangeModalOpen] = useState(false);
@@ -41,9 +45,17 @@ export default function VotingHome() {
             <ImageGallery />
 
             <div className="voting__buttons">
-                <button className="btn btn-secondary add-new" onClick={handleAddNewClick}>Add New</button>
-                <button className="btn btn-primary" onClick={handleOpenChangeModal}>Change existing</button>
-                <button className="btn btn-primary" onClick={handleOpenInfoModal}>Show installation</button>
+                <div className="voting__changebuttons">
+                    <button className="btn btn-textlink add-new" onClick={handleAddNewClick}>
+                        <PiPlusThin />
+                        <span>add new</span>
+                    </button>
+                    <button className="btn btn-textlink edit-item" onClick={handleOpenChangeModal}>
+                        <PiPencilSimpleThin />
+                        <span>edit item</span>
+                    </button>
+                </div>
+                <button className="btn btn-textlink show-install" onClick={handleOpenInfoModal}>show installation</button>
             </div>
 
             <ChangeItemModal isOpen={isChangeModalOpen} onClose={handleCloseChangeModal} />
