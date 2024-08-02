@@ -213,12 +213,13 @@ const NewItemForm: React.FC = () => {
             <div className="form-group slider">
                 <div className="rating-container">
                     <label htmlFor="slider">How misogynistic is it?</label>
-                    <span>{sliderValue}</span>
+                    <span className="range-value">{sliderValue}%</span>
                 </div>
                 <div className="rating-container">
                     <input
                         type="range"
                         id="slider"
+                        className="range-input"
                         min="0"
                         max="100"
                         value={sliderValue}
@@ -235,12 +236,13 @@ const NewItemForm: React.FC = () => {
                 <div className="form-group slider">
                     <div className="rating-container">
                         <label htmlFor="individual-slider">{categoryData?.individualSliderHeadline}</label>
-                        <span>{individualSliderValue}</span>
+                        <span className="range-value">{individualSliderValue}%</span>
                     </div>
                     <div className="rating-container">
                         <input
                             type="range"
                             id="individual-slider"
+                            className="range-input"
                             min="0"
                             max="100"
                             value={individualSliderValue}
