@@ -1,6 +1,3 @@
-console.log('API Key:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
-
-
 // Import the functions you need from the SDKs
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";

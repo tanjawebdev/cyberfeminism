@@ -34,7 +34,7 @@ export default function MobileLayout({
   children: React.ReactNode
 }) {
   return (
-      <html lang="en" className={`${GeistSans.variable} mobile-view`}>
+      <html lang="en" className={GeistSans.variable}>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/str2hdb.css"/>
       </head>

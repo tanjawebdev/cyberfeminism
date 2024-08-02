@@ -1,0 +1,42 @@
+.newItemForm {
+  padding: 0 1rem;
+
+  input:not([type="range"]), select {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.5rem 1rem;
+    color: white;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    width: 100%;
+
+    &::placeholder {
+      color: white;
+      font-weight: 300;
+    }
+  }
+
+  h3 {
+    text-transform: uppercase;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .slider {
+    margin-bottom: 2rem;
+  }
+
+  .rating-container {
+    justify-content: space-between;
+    display: flex;
+
+    input {
+      width: 100%;
+    }
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

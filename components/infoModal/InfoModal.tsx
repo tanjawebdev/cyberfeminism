@@ -15,7 +15,8 @@ const InfoModal: React.FC<ChangeItemModalProps> = ({ isOpen, onClose }) => {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <p>To see the installation you have to open this website: cyberfeminism.com on a big screen (monitor)</p>
+            <h2>Show installation</h2>
+            <p>To see the installation you have to open this website: <span className="link-underline">bias-barometer.com</span> on a big screen (monitor).</p>
         </Modal>
     );
 };

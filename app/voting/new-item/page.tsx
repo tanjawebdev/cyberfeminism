@@ -7,12 +7,6 @@ export default function VotingNewItem() {
 
     return (
         <main className="voting">
-            <div className="voting__header">
-                <Link href="/voting" className="back-link">
-                    Back
-                </Link>
-            </div>
-            <h1>Add New Item</h1>
             <NewItemForm/>
         </main>
     );

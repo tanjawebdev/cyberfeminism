@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
 import './Modal.scss';
+import { TfiClose } from "react-icons/tfi";
+
 
 interface ModalProps {
     isOpen: boolean;
@@ -14,7 +16,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         <div className="modalOverlay">
             <div className="modal">
                 <button className="closeButton" onClick={onClose}>
-                    &times;
+                    <TfiClose />
                 </button>
                 {children}
             </div>

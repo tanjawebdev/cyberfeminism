@@ -36,3 +36,9 @@ body {
   min-height: 100%;
   max-width: 100vw;
 }
+
+.link-underline {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}

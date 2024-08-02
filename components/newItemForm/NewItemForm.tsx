@@ -164,39 +164,29 @@ const NewItemForm: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="newItemForm">
             <div className="form-group">
-                <label htmlFor="name">Name:</label>
                 <input
                     type="text"
                     id="name"
+                    placeholder="Name of the item*"
                     value={name}
                     onChange={handleNameChange}
                     required
                 />
                 {closestMatch && (
                     <p className="closest-match">
-                         An item with name <strong>&quot;{closestMatch}&quot;</strong> is already existing. <br/>
+                        An item with name <strong>&quot;{closestMatch}&quot;</strong> is already existing. <br/>
                         Edit Existing. Continue with new Item. Quit.
                     </p>
                 )}
             </div>
 
-            <div className="form-group">
-                <label htmlFor="file-upload">Upload Image:</label>
-                <input
-                    type="file"
-                    id="file-upload"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                />
-            </div>
 
             <div className="form-group">
-                <label htmlFor="dropdown">Select Category:</label>
                 <select id="dropdown" value={dropdownValue} onChange={handleDropdownChange} required>
                     <option value="" disabled>
-                        Select an option
+                        Category*
                     </option>
                     {categories.map(category => (
                         <option key={category.id} value={category.id}>
@@ -206,39 +196,65 @@ const NewItemForm: React.FC = () => {
                 </select>
             </div>
 
+            /*google api file upload*/
+
             <div className="form-group">
-                <label htmlFor="slider">Rating:</label>
+                <label htmlFor="file-upload">Choose Item Image:</label>
                 <input
-                    type="range"
-                    id="slider"
-                    min="0"
-                    max="100"
-                    value={sliderValue}
-                    onChange={handleSliderChange}
+                    type="file"
+                    id="file-upload"
+                    accept="image/*"
+                    onChange={handleFileChange}
                 />
-                <span>{sliderValue}</span>
+            </div>
+
+
+            <h3>Your Ratings</h3>
+            <div className="form-group slider">
+                <div className="rating-container">
+                    <label htmlFor="slider">How misogynistic is it?</label>
+                    <span>{sliderValue}</span>
+                </div>
+                <div className="rating-container">
+                    <input
+                        type="range"
+                        id="slider"
+                        min="0"
+                        max="100"
+                        value={sliderValue}
+                        onChange={handleSliderChange}
+                    />
+                </div>
+                <div className="rating-container slider-titles">
+                    <span>feminist</span>
+                    <span>sexist</span>
+                </div>
             </div>
 
             {categoryData && (
-                <div className="form-group">
-                    <label htmlFor="individual-slider">{categoryData?.individualSliderHeadline}:</label>
-                    <input
-                        type="range"
-                        id="individual-slider"
-                        min="0"
-                        max="100"
-                        value={individualSliderValue}
-                        onChange={handleIndividualSliderChange}
-                    />
-                    <div className="slider-titles">
+                <div className="form-group slider">
+                    <div className="rating-container">
+                        <label htmlFor="individual-slider">{categoryData?.individualSliderHeadline}</label>
+                        <span>{individualSliderValue}</span>
+                    </div>
+                    <div className="rating-container">
+                        <input
+                            type="range"
+                            id="individual-slider"
+                            min="0"
+                            max="100"
+                            value={individualSliderValue}
+                            onChange={handleIndividualSliderChange}
+                        />
+                    </div>
+                    <div className="rating-container slider-titles">
                         <span>{categoryData?.individualSliderMinTitle}</span>
                         <span>{categoryData?.individualSliderMaxTitle}</span>
                     </div>
-                    <span>{individualSliderValue}</span>
                 </div>
             )}
 
-            <button type="submit" disabled={uploading}>
+            <button type="submit" disabled={uploading} className="btn btn-secondary">
                 {uploading ? 'Uploading...' : 'Submit'}
             </button>
         </form>
