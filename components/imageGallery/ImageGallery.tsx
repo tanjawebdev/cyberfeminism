@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import './ImageGallery.scss';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow } from 'swiper/modules';
-import SwiperCore from 'swiper';
+import SwiperCore, { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 
@@ -31,7 +31,7 @@ const ImageGallery: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [currentRating, setCurrentRating] = useState<number | null>(null);
     const router = useRouter();
-    const swiperRef = useRef<SwiperCore | null>(null);
+    const swiperRef = useRef<SwiperType | null>(null);
 
     const fetchLatestItems = async (category: string | null = null) => {
         const itemsRef = collection(db, 'items');
@@ -87,7 +87,7 @@ const ImageGallery: React.FC = () => {
         }
     };
 
-    const handleSlideChange = (swiper) => {
+    const handleSlideChange = (swiper: SwiperType) => {
         const activeIndex = swiper.activeIndex;
         if (latestItems[activeIndex]) {
             setCurrentRating(latestItems[activeIndex].rating);

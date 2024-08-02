@@ -1,6 +1,6 @@
 {
-  "short_name": "MyApp",
-  "name": "My Awesome Application",
+  "short_name": "Bias Barometer",
+  "name": "Bias Barometer",
   "icons": [
     {
       "src": "/icons/favicons/android-chrome-192x192.png",
