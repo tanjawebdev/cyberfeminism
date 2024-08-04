@@ -196,7 +196,7 @@ const NewItemForm: React.FC = () => {
                 </select>
             </div>
 
-            {/*google api file upload*/}
+            {/* TODO: google api file upload */}
 
             <div className="form-group">
                 <label htmlFor="file-upload">Choose Item Image:</label>
