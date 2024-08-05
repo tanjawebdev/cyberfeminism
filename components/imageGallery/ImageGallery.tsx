@@ -101,9 +101,19 @@ const ImageGallery: React.FC = () => {
         console.log('Touch start', e);
     };
 
+    const handleGalleryClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'IMG' && target.classList.contains('image-gallery__gallery-image')) {
+            const id = target.getAttribute('data-id');
+            if (id) {
+                handleImageClick(Number(id));
+            }
+        }
+    };
+
     return (
         <div className="image-gallery">
-            <div className="image-container" onTouchStart={handleTouchStart}>
+            <div className="image-container" onTouchStart={handleTouchStart} onClick={handleGalleryClick}>
                 <span className="image-gallery__rating">⌀ Rating:</span>
                 <div className="swiper-container">
                     <Swiper
@@ -129,10 +139,10 @@ const ImageGallery: React.FC = () => {
                     >
                         {latestItems.map((item) => (
                             <SwiperSlide key={item.id}>
-                                <div className="item" onClick={() => handleImageClick(item.id)}>
+                                <div className="item">
                                     <div className="image-gallery__image">
                                         <img src={item.fileUrl} alt={`Item ${item.id}`}
-                                             className="image-gallery__gallery-image"/>
+                                             className="image-gallery__gallery-image" data-id={item.id}/>
                                     </div>
                                 </div>
                             </SwiperSlide>
