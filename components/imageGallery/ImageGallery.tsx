@@ -96,9 +96,13 @@ const ImageGallery: React.FC = () => {
         }
     };
 
+    const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+        console.log('Touch start', e);
+    };
+
     return (
         <div className="image-gallery">
-            <div className="image-container">
+            <div className="image-container" onTouchStart={handleTouchStart}>
                 <span className="image-gallery__rating">⌀ Rating:</span>
                 <div className="swiper-container">
                     <Swiper
@@ -119,6 +123,8 @@ const ImageGallery: React.FC = () => {
                         className="mySwiper"
                         onSlideChange={handleSlideChange}
                         onSwiper={(swiper) => (swiperRef.current = swiper)}
+                        preventClicks={false}
+                        preventClicksPropagation={false}
                     >
                         {latestItems.map((item) => (
                             <SwiperSlide key={item.id}>
