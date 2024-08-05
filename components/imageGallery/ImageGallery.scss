@@ -12,6 +12,12 @@
   .swiper-container {
     transform: scale(1.5);
     margin: 2.5rem 0;
+    touch-action: pan-y;
+    width: 100%;
+  }
+
+  .swiper-slide-active {
+    z-index: 10;
   }
 
   .image-gallery__image {
