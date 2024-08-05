@@ -146,7 +146,7 @@ const EditItemForm: React.FC = () => {
 
     return (
         <form onSubmit={handleSubmit}
-              className="newItemForm">
+              className="editItemForm">
             <div className="form-group">
                 <div className="image-uploaded">
                     <img src={itemData.fileUrl} alt="Uploaded Item" className="uploaded-image"/>
