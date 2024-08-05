@@ -9,6 +9,10 @@
     overflow: hidden;
   }
 
+  .swiper-wrapper {
+    pointer-events: none;
+  }
+
   .swiper-container {
     transform: scale(1.5);
     margin: 2.5rem 0;
