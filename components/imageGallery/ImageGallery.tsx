@@ -75,7 +75,6 @@ const ImageGallery: React.FC = () => {
     }, [latestItems]);
 
     const handleImageClick = (id: number) => {
-        console.log(id);
         router.push(`/voting/edit-item?id=${id}`);
     };
 
@@ -95,10 +94,6 @@ const ImageGallery: React.FC = () => {
         }
     };
 
-    const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-        console.log('Touch start', e);
-    };
-
     const handleGalleryClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;
         if (target.tagName === 'IMG' && target.classList.contains('image-gallery__gallery-image')) {
@@ -111,7 +106,7 @@ const ImageGallery: React.FC = () => {
 
     return (
         <div className="image-gallery">
-            <div className="image-container" onTouchStart={handleTouchStart} onClick={handleGalleryClick}>
+            <div className="image-container" onClick={handleGalleryClick}>
                 <span className="image-gallery__rating">⌀ Rating:</span>
                 <div className="swiper-container">
                     <Swiper
