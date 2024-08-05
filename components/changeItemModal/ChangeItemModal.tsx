@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Modal from '@components/modal/Modal';
 import '@components/modal/Modal.scss';
+import './ChangeItemModal.scss';
+
 
 interface ChangeItemModalProps {
     isOpen: boolean;
@@ -36,7 +38,7 @@ const ChangeItemModal: React.FC<ChangeItemModalProps> = ({ isOpen, onClose }) =>
         <Modal isOpen={isOpen} onClose={onClose}>
             <h2>Change Existing Item</h2>
             <p>What is the ID of your Element?</p>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="changeItemModal">
                 <input
                     type="number"
                     value={inputValue}

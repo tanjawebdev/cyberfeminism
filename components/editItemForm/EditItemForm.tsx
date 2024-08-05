@@ -12,6 +12,7 @@ interface ItemData {
     rating: number;
     individualRating: number;
     id: number;
+    name: string;
     createdAt: any;
     editedAt: any;
     sortDate: any;
@@ -62,7 +63,12 @@ const EditItemForm: React.FC = () => {
                 if (!querySnapshot.empty) {
                     const documentSnapshot = querySnapshot.docs[0];
                     const data = documentSnapshot.data() as ItemData;
-                    setItemData(data);
+                    setItemData({
+                        ...data,
+                        sortDate: data.sortDate?.toDate(),
+                        createdAt: data.createdAt?.toDate(),
+                        editedAt: data.editedAt?.toDate()
+                    });
                     setSliderValue(data.rating); // Initialize slider with current rating
                     setIndividualSliderValue(data.individualRating);
 
@@ -139,58 +145,86 @@ const EditItemForm: React.FC = () => {
     if (!itemData) return <p>Loading...</p>;
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}
+              className="newItemForm">
             <div className="form-group">
-                <label>Uploaded Image:</label>
-                <div>
+                <div className="image-uploaded">
                     <img src={itemData.fileUrl} alt="Uploaded Item" className="uploaded-image"/>
                 </div>
             </div>
 
-            <div className="form-group">
-                <label>Category:</label>
-                <p>{getCategoryName(itemData.category)}</p>
+            <div className="form-group slider">
+                <div className="rating-container">
+                    <label htmlFor="slider">How misogynistic is it?</label>
+                    <span className="range-value">{sliderValue}%</span>
+                </div>
+                <div className="rating-container">
+                    <input
+                        type="range"
+                        id="slider"
+                        className="range-input"
+                        min="0"
+                        max="100"
+                        value={sliderValue}
+                        onChange={handleSliderChange}
+                    />
+                </div>
+                <div className="rating-container slider-titles">
+                    <span>feminist</span>
+                    <span>sexist</span>
+                </div>
             </div>
 
-            <div className="form-group">
-            <label>ID:</label>
-                <p>{itemData.id}</p>
-            </div>
 
-            <div className="form-group">
-                <label htmlFor="slider">Rating:</label>
-                <input
-                    type="range"
-                    id="slider"
-                    min="0"
-                    max="100"
-                    value={sliderValue}
-                    onChange={handleSliderChange}
-                />
-                <span>{sliderValue}</span>
-            </div>
             {categoryData && (
-                <>
-                    <div className="form-group">
-                        <label htmlFor="individual-slider">{categoryData.individualSliderHeadline}:</label>
+                <div className="form-group slider">
+                    <div className="rating-container">
+                        <label htmlFor="individual-slider">{categoryData?.individualSliderHeadline}</label>
+                        <span className="range-value">{individualSliderValue}%</span>
+                    </div>
+                    <div className="rating-container">
                         <input
                             type="range"
                             id="individual-slider"
+                            className="range-input"
                             min="0"
                             max="100"
                             value={individualSliderValue}
                             onChange={handleIndividualSliderChange}
                         />
-                        <div className="slider-titles">
-                            <span>{categoryData.individualSliderMinTitle}</span>
-                            <span>{categoryData.individualSliderMaxTitle}</span>
-                        </div>
-                        <span>{individualSliderValue}</span>
                     </div>
-                </>
+                    <div className="rating-container slider-titles">
+                        <span>{categoryData?.individualSliderMinTitle}</span>
+                        <span>{categoryData?.individualSliderMaxTitle}</span>
+                    </div>
+                </div>
             )}
 
-            <button type="submit" disabled={updating} className="btn btn-primary">
+            <div className="existingData">
+
+                <div className="form-group">
+                    <span>Name:</span>
+                    <p>{itemData.name}</p>
+                </div>
+
+                <div className="form-group">
+                    <span>Category:</span>
+                    <p>{getCategoryName(itemData.category)}</p>
+                </div>
+
+                <div className="form-group">
+                    <span>ID:</span>
+                    <p>{itemData.id}</p>
+                </div>
+
+
+                <div className="form-group">
+                    <span>Last Change:</span>
+                    <p>{itemData.sortDate ? itemData.sortDate.toLocaleDateString() : 'N/A'}</p>
+                </div>
+            </div>
+
+            <button type="submit" disabled={updating} className="btn btn-secondary">
                 {updating ? 'Updating...' : 'Submit'}
             </button>
         </form>

@@ -7,6 +7,7 @@ import { collection, doc, runTransaction, getDoc, getDocs } from 'firebase/fires
 import { useRouter } from 'next/navigation';
 import leven from 'leven';
 import './NewItemForm.scss';
+import {TfiClose} from "react-icons/tfi";
 
 interface FileType extends File {
     name: string;
@@ -59,6 +60,9 @@ const NewItemForm: React.FC = () => {
             setFile(e.target.files[0] as FileType);
         }
     };
+    const handleRemoveFile = () => {
+        setFile(null);
+    };
 
     const handleDropdownChange = async (e: ChangeEvent<HTMLSelectElement>) => {
         const selectedCategory = e.target.value;
@@ -85,7 +89,7 @@ const NewItemForm: React.FC = () => {
             const closest = existingNames.reduce((a, b) =>
                 leven(newName, a) < leven(newName, b) ? a : b
             );
-            setClosestMatch(leven(newName, closest) <= 3 ? closest : '');
+            setClosestMatch(leven(newName, closest) <= 1.7 ? closest : '');
         } else {
             setClosestMatch('');
         }
@@ -195,16 +199,30 @@ const NewItemForm: React.FC = () => {
                     ))}
                 </select>
             </div>
-            <div className="form-group">
-                <label htmlFor="file-upload">Choose Item Image:</label>
-                <input
-                    type="file"
-                    id="file-upload"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                />
-            </div>
 
+            <div className="upload-wrap">
+                <span className="chooseImage">Choose Item Image*</span>
+                <div className="form-group file-upload-item upload-google-image">
+                    {/* TODO: google api file upload */}
+                </div>
+                <span className="upload-or">OR</span>
+                <div className="form-group file-upload-item">
+                    <input
+                        type="file"
+                        id="file-upload"
+                        accept=".jpeg, .jpg, .png"
+                        onChange={handleFileChange}
+                    />
+                    {file && (
+                        <div className="file-info">
+                            <span>{file.name}</span>
+                            <button type="button" className="close-button" onClick={handleRemoveFile}>
+                                <TfiClose />
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             <h3>Your Ratings</h3>
             <div className="form-group slider">
