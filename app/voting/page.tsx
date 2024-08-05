@@ -38,6 +38,7 @@ export default function VotingHome() {
 
     return (
         <main className="voting">
+            <RedirectBasedOnWidth />
             <div className="voting__header">
                 <h1>Ra(n)ting Now</h1>
                 <span>Be the change: Rate media based on feminist principles. Your opinion matters!</span>
