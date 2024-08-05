@@ -27,11 +27,12 @@ h2 {
 input[type="range"] {
   font-size: 1.5rem;
   width: 100%;
-  margin: 0rem 0 0.25rem;
+  margin: 0 0 0.25rem;
 }
 
 input[type="range"] {
   color: #ffffff;
+  padding: 1rem 0;
   --thumb-height: 0.6em;
   --track-height: 0.125em;
   --track-color: rgba(0, 0, 0, 0.2);
