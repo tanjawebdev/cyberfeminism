@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import RedirectBasedOnWidth from '@components/redirectBasedOnWidth/RedirectBasedOnWidth';
 import Image from "next/image";
 import { collection, query, where, orderBy, onSnapshot, getDocs, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -91,6 +92,7 @@ export default function Home() {
 
     return (
         <main className="home">
+            <RedirectBasedOnWidth />
             <div>Startscreen</div>
             <div className="home__home-modal">
                 <div className="btn btn-primary g-col" onClick={handleOpenHomeModal}>edit or add items</div>

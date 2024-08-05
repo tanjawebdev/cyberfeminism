@@ -152,7 +152,7 @@ const NewItemForm: React.FC = () => {
                 });
             });
 
-            alert('File uploaded and metadata saved successfully!');
+            alert('Media item successfully added!');
             router.push('/voting');
         } catch (error) {
             console.error('Error uploading file and saving metadata: ', error);

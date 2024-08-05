@@ -124,7 +124,7 @@ const EditItemForm: React.FC = () => {
                     sortDate: new Date(),
                 });
 
-                alert('Slider value updated successfully!');
+                alert('Rating value updated successfully!');
                 router.push('/voting');
             } else {
                 console.error('No such document!');
