@@ -251,12 +251,19 @@ const NewItemForm: React.FC = () => {
                 </button>
 
                 {imageURL && confirmImage && (
-                    <div className="form-group">
-                        <img src={imageURL} alt="Google Image" style={{ maxWidth: '100%' }} />
+                    <div className="form-group googleImage-wrapper">
+                        <img className="googleImage" src={imageURL} alt="Google Image" style={{ maxWidth: '100%' }} />
                         <div className="confirm-buttons">
-                            <button type="button" onClick={handleAcceptImage}>Accept</button>
-                            <button type="button" onClick={handleCancelImage}>Cancel</button>
+                            <button type="button" className="btn btn-secondary" onClick={handleAcceptImage}>Accept</button>
+                            <button type="button" className="btn btn-secondary" onClick={handleCancelImage}>Cancel</button>
                         </div>
+                    </div>
+                )}
+
+                {imageURL && !confirmImage && (
+                    <div className="form-group googleImage-confirmed">
+                        <span>Your image:</span>
+                        <img src={imageURL} alt="Google Image" style={{ maxWidth: '100%' }} />
                     </div>
                 )}
                 <span className="upload-or">OR</span>
@@ -278,11 +285,7 @@ const NewItemForm: React.FC = () => {
                 </div>
             </div>
 
-            {imageURL && !confirmImage && (
-                <div className="form-group">
-                    <img src={imageURL} alt="Google Image" style={{ maxWidth: '100%' }} />
-                </div>
-            )}
+
 
             <h3>Your Ratings</h3>
             <div className="form-group slider">
