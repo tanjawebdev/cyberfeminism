@@ -77,6 +77,7 @@ const ImageGallery: React.FC = () => {
     const handleImageClick = (id: number) => {
         console.log(id);
         console.log('test clicked');
+        return;
         router.push(`/voting/edit-item?id=${id}`);
     };
 
