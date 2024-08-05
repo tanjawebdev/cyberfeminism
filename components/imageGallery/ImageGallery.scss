@@ -35,12 +35,12 @@
   .categories {
     display: flex;
     flex-wrap: nowrap;
-    overflow-x: auto;
+    overflow-x: scroll;
     gap: .75rem;
     padding-block: 1rem;
     padding-inline: 1rem;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    //-ms-overflow-style: none;
+    //scrollbar-width: none;
 
     .btn {
       margin: 0;
