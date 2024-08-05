@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans';
 import "@styles/globals.scss";
+import "@styles/globalsDesktop.scss";
 
 export const metadata: Metadata = {
   title: "Cyberfeminism",
@@ -21,8 +22,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#e0e0e0' },
-    { media: '(prefers-color-scheme: dark)', color: '#e0e0e0' },
+    { media: '(prefers-color-scheme: light)', color: '#121212' },
+    { media: '(prefers-color-scheme: dark)', color: '#121212' },
   ],
 }
 
