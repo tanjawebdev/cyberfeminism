@@ -1,15 +1,16 @@
+
 // Import the functions you need from the SDKs
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBzjwtQldRswb6aIkuEayaxdnemvOlDDGE",
-    authDomain: "cyberfeminism.firebaseapp.com",
-    projectId: "cyberfeminism",
-    storageBucket: "cyberfeminism.appspot.com",
-    messagingSenderId: "837718669527",
-    appId: "1:837718669527:web:f17447289b91db7d2c5892",
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
