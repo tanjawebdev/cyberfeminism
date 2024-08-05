@@ -1,13 +1,12 @@
-'use client';
-
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import { fetchGoogleImage } from "lib/googleSearch"; // Import the function
 import { storage, db } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, doc, runTransaction, getDoc, getDocs } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import leven from 'leven';
 import './NewItemForm.scss';
-import {TfiClose} from "react-icons/tfi";
+import { TfiClose } from "react-icons/tfi";
 
 interface FileType extends File {
     name: string;
@@ -33,6 +32,8 @@ const NewItemForm: React.FC = () => {
     const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
     const [existingNames, setExistingNames] = useState<string[]>([]);
     const [closestMatch, setClosestMatch] = useState<string>('');
+    const [imageURL, setImageURL] = useState<string>('');
+    const [confirmImage, setConfirmImage] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchCategoriesAndNames = async () => {
@@ -60,6 +61,7 @@ const NewItemForm: React.FC = () => {
             setFile(e.target.files[0] as FileType);
         }
     };
+
     const handleRemoveFile = () => {
         setFile(null);
     };
@@ -101,8 +103,8 @@ const NewItemForm: React.FC = () => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!file) {
-            alert('Please upload a file.');
+        if (!file && !imageURL) {
+            alert('Please upload a file or select a recommended image.');
             return;
         }
 
@@ -114,17 +116,28 @@ const NewItemForm: React.FC = () => {
         setUploading(true);
 
         try {
-            // Upload file to Firebase Storage
-            const fileRef = ref(storage, `uploads/${file.name}`);
-            await uploadBytes(fileRef, file);
-            const fileUrl = await getDownloadURL(fileRef);
+            let fileUrl = '';
 
-            const resizedFileName = file.name.replace(/\.[^/.]+$/, "") + "_350x350.webp";
+            if (file) {
+                // Upload file to Firebase Storage
+                const fileRef = ref(storage, `uploads/${file.name}`);
+                await uploadBytes(fileRef, file);
+                fileUrl = await getDownloadURL(fileRef);
+            } else if (imageURL) {
+                // Download and upload the Google image to Firebase Storage
+                const response = await fetch(imageURL);
+                const blob = await response.blob();
+                const fileName = `${name.replace(/\s+/g, '_')}.jpg`;
+                const fileRef = ref(storage, `uploads/${fileName}`);
+                await uploadBytes(fileRef, blob);
+                fileUrl = await getDownloadURL(fileRef);
+            }
+
+            const resizedFileName = fileUrl.replace(/\.[^/.]+$/, "") + "_350x350.webp";
             const resizedFileRef = ref(storage, `uploads/${resizedFileName}`);
 
             await new Promise(resolve => setTimeout(resolve, 5000));
             const resizedFileUrl = await getDownloadURL(resizedFileRef);
-
 
             // Transaction to update counter and add new item
             await runTransaction(db, async (transaction) => {
@@ -164,7 +177,40 @@ const NewItemForm: React.FC = () => {
             setDropdownValue('');
             setSliderValue(50);
             setIndividualSliderValue(50);
+            setImageURL('');
+            setConfirmImage(false);
         }
+    };
+
+    const handleGoogleSearch = async () => {
+        if (!name || !dropdownValue) {
+            alert('Please enter a name and select a category.');
+            return;
+        }
+
+        const category = categories.find(cat => cat.id === dropdownValue);
+        if (!category) {
+            alert('Invalid category.');
+            return;
+        }
+
+        const searchQuery = `${category.categoryName} ${name}`;
+        const image = await fetchGoogleImage(searchQuery);
+        if (image) {
+            setImageURL(image);
+            setConfirmImage(true);
+        } else {
+            alert('No image found.');
+        }
+    };
+
+    const handleAcceptImage = () => {
+        setConfirmImage(false);
+    };
+
+    const handleCancelImage = () => {
+        setImageURL('');
+        setConfirmImage(false);
     };
 
     return (
@@ -186,7 +232,6 @@ const NewItemForm: React.FC = () => {
                 )}
             </div>
 
-
             <div className="form-group">
                 <select id="dropdown" value={dropdownValue} onChange={handleDropdownChange} required>
                     <option value="" disabled>
@@ -202,9 +247,18 @@ const NewItemForm: React.FC = () => {
 
             <div className="upload-wrap">
                 <span className="chooseImage">Choose Item Image*</span>
-                <div className="form-group file-upload-item upload-google-image">
-                    {/* TODO: google api file upload */}
-                </div>
+                <button type="button" onClick={handleGoogleSearch} className="form-group file-upload-item upload-google-image">
+                </button>
+
+                {imageURL && confirmImage && (
+                    <div className="form-group">
+                        <img src={imageURL} alt="Google Image" style={{ maxWidth: '100%' }} />
+                        <div className="confirm-buttons">
+                            <button type="button" onClick={handleAcceptImage}>Accept</button>
+                            <button type="button" onClick={handleCancelImage}>Cancel</button>
+                        </div>
+                    </div>
+                )}
                 <span className="upload-or">OR</span>
                 <div className="form-group file-upload-item">
                     <input
@@ -223,6 +277,12 @@ const NewItemForm: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            {imageURL && !confirmImage && (
+                <div className="form-group">
+                    <img src={imageURL} alt="Google Image" style={{ maxWidth: '100%' }} />
+                </div>
+            )}
 
             <h3>Your Ratings</h3>
             <div className="form-group slider">
