@@ -91,7 +91,7 @@ const NewItemForm: React.FC = () => {
             const closest = existingNames.reduce((a, b) =>
                 leven(newName, a) < leven(newName, b) ? a : b
             );
-            setClosestMatch(leven(newName, closest) <= 1.7 ? closest : '');
+            setClosestMatch(leven(newName, closest) <= 2 ? closest : '');
         } else {
             setClosestMatch('');
         }
