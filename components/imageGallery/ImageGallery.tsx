@@ -34,7 +34,7 @@ const ImageGallery: React.FC = () => {
     const swiperRef = useRef<SwiperType | null>(null);
 
     const fetchLatestItems = async (category: string | null = null) => {
-        const itemsRef = collection(db, 'items');
+        const itemsRef = collection(db, 'realitems');
         let q;
         if (category) {
             q = query(itemsRef, where('category', '==', category), orderBy('sortDate', 'desc'), limit(5));

@@ -45,7 +45,7 @@ const NewItemForm: React.FC = () => {
             })) as CategoryData[];
             setCategories(categoriesData);
 
-            const itemsRef = collection(db, 'items');
+            const itemsRef = collection(db, 'realitems');
             const itemsSnapshot = await getDocs(itemsRef);
             const itemNames = itemsSnapshot.docs
                 .map(doc => doc.data().name)
@@ -148,7 +148,7 @@ const NewItemForm: React.FC = () => {
 
             // Transaction to update counter and add new item
             await runTransaction(db, async (transaction) => {
-                const counterDocRef = doc(db, 'counters', 'itemCounter');
+                const counterDocRef = doc(db, 'counters', 'realItemCounter');
                 const counterDoc = await transaction.get(counterDocRef);
                 if (!counterDoc.exists()) {
                     throw new Error('Counter document does not exist!');

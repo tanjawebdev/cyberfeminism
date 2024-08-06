@@ -32,7 +32,7 @@ export default function Home() {
     const [categories, setCategories] = useState<CategoryData[]>([]);
 
     const fetchItems = (category: string | null) => {
-        const itemsRef = collection(db, 'items');
+        const itemsRef = collection(db, 'realitems');
         let q;
         if (category) {
             q = query(itemsRef, where('category', '==', category), orderBy('sortDate', 'desc'));

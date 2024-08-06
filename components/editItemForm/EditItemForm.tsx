@@ -57,7 +57,7 @@ const EditItemForm: React.FC = () => {
     useEffect(() => {
         if (id) {
             const fetchItem = async () => {
-                const itemsRef = collection(db, 'items');
+                const itemsRef = collection(db, 'realitems');
                 const q = query(itemsRef, where('id', '==', id));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
@@ -101,7 +101,7 @@ const EditItemForm: React.FC = () => {
         setUpdating(true);
 
         try {
-            const itemsRef = collection(db, 'items');
+            const itemsRef = collection(db, 'realitems');
             const q = query(itemsRef, where('id', '==', id));
             const querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) {
