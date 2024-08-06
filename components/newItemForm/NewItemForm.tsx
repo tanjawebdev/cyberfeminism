@@ -140,8 +140,11 @@ const NewItemForm: React.FC = () => {
                 }
             }
 
-            // Use the uploaded image URL directly, without waiting for resizing
-            const resizedFileUrl = fileUrl; // Replace this with actual resizing logic if available
+            const [urlPath, urlParams] = fileUrl.split('?');
+            const urlParts = urlPath.split('/');
+            const fileName = urlParts.pop() as string;
+            const newFileName = fileName.replace(/\.[^/.]+$/, "_350x350.webp");
+            const resizedFileUrl = [...urlParts, newFileName].join('/') + (urlParams ? `?${urlParams}` : '');
 
             // Transaction to update counter and add new item
             await runTransaction(db, async (transaction) => {
