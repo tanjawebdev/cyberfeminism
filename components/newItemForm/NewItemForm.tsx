@@ -20,6 +20,11 @@ interface CategoryData {
     individualSliderMaxTitle: string;
 }
 
+interface ExistingItem {
+    id: string;  // This should be your custom ID
+    name: string;
+}
+
 const NewItemForm: React.FC = () => {
     const router = useRouter();
     const [name, setName] = useState<string>('');
@@ -31,9 +36,12 @@ const NewItemForm: React.FC = () => {
     const [categories, setCategories] = useState<CategoryData[]>([]);
     const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
     const [existingNames, setExistingNames] = useState<string[]>([]);
+    const [existingItems, setExistingItems] = useState<ExistingItem[]>([]);
     const [closestMatch, setClosestMatch] = useState<string>('');
+    const [closestMatchId, setClosestMatchId] = useState<string>('');
     const [imageURL, setImageURL] = useState<string>('');
     const [confirmImage, setConfirmImage] = useState<boolean>(false);
+    const [showButtons, setShowButtons] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchCategoriesAndNames = async () => {
@@ -47,6 +55,11 @@ const NewItemForm: React.FC = () => {
 
             const itemsRef = collection(db, 'realitems');
             const itemsSnapshot = await getDocs(itemsRef);
+            const itemsData = itemsSnapshot.docs.map(doc => ({
+                id: doc.data().id,  // Use custom ID field
+                name: doc.data().name
+            })) as ExistingItem[];
+            setExistingItems(itemsData);
             const itemNames = itemsSnapshot.docs
                 .map(doc => doc.data().name)
                 .filter(name => name) as string[];
@@ -91,14 +104,43 @@ const NewItemForm: React.FC = () => {
             const closest = existingNames.reduce((a, b) =>
                 leven(newName, a) < leven(newName, b) ? a : b
             );
-            setClosestMatch(leven(newName, closest) <= 2 ? closest : '');
+            if (leven(newName, closest) <= 2) {
+                setClosestMatch(closest);
+                setShowButtons(true);
+
+                const matchedItem = existingItems.find(item => item.name === closest);
+                setClosestMatchId(matchedItem ? matchedItem.id : '');
+            } else {
+                setClosestMatch('');
+                setClosestMatchId('');
+                setShowButtons(false);
+            }
         } else {
             setClosestMatch('');
+            setClosestMatchId('');
+            setShowButtons(false);
         }
     };
 
     const handleIndividualSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
         setIndividualSliderValue(parseInt(e.target.value, 10));
+    };
+
+    const handleEditExisting = () => {
+        if (closestMatchId) {
+            router.push(`/voting/edit-item?id=${closestMatchId}`);
+        } else {
+            console.error('No matching item found');
+        }
+    };
+
+    const handleAddItem = () => {
+        setShowButtons(false);
+    };
+
+    const handleCancelName = () => {
+        setName('');
+        setShowButtons(false);
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -119,12 +161,10 @@ const NewItemForm: React.FC = () => {
             let fileUrl = '';
 
             if (file) {
-                // Upload file to Firebase Storage
                 const fileRef = ref(storage, `uploads/${file.name}`);
                 await uploadBytes(fileRef, file);
                 fileUrl = await getDownloadURL(fileRef);
             } else if (imageURL) {
-                // Send the image URL and name to the API route
                 const response = await fetch('/api/uploadImage', {
                     method: 'POST',
                     headers: {
@@ -146,7 +186,6 @@ const NewItemForm: React.FC = () => {
             const newFileName = fileName.replace(/\.[^/.]+$/, "_350x350.webp");
             const resizedFileUrl = [...urlParts, newFileName].join('/') + (urlParams ? `?${urlParams}` : '');
 
-            // Transaction to update counter and add new item
             await runTransaction(db, async (transaction) => {
                 const counterDocRef = doc(db, 'counters', 'realItemCounter');
                 const counterDoc = await transaction.get(counterDocRef);
@@ -233,9 +272,15 @@ const NewItemForm: React.FC = () => {
                 />
                 {closestMatch && (
                     <p className="closest-match">
-                        An item with name <strong>&quot;{closestMatch}&quot;</strong> is already existing. <br/>
-                        Edit Existing. Continue with new Item. Quit.
+                        An item with name <strong>&quot;{closestMatch}&quot;</strong> is already existing.
                     </p>
+                )}
+                {showButtons && (
+                    <div className="name-buttons">
+                        <button type="button" className="btn btn-secondary" onClick={handleEditExisting}>Edit Existing Item</button>
+                        <button type="button" className="btn btn-secondary" onClick={handleAddItem}>Add Item</button>
+                        <button type="button" className="btn btn-secondary" onClick={handleCancelName}>Cancel</button>
+                    </div>
                 )}
             </div>
 
@@ -255,6 +300,7 @@ const NewItemForm: React.FC = () => {
             <div className="upload-wrap">
                 <span className="chooseImage">Choose Item Image*</span>
                 <button type="button" onClick={handleGoogleSearch} className="form-group file-upload-item upload-google-image">
+                    Recommended Image
                 </button>
 
                 {imageURL && confirmImage && (
