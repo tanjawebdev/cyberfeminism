@@ -140,15 +140,12 @@ const NewItemForm: React.FC = () => {
                 }
             }
 
-            const resizedFileName = fileUrl.replace(/\.[^/.]+$/, "") + "_350x350.webp";
-            const resizedFileRef = ref(storage, `uploads/${resizedFileName}`);
-
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            const resizedFileUrl = await getDownloadURL(resizedFileRef);
+            // Use the uploaded image URL directly, without waiting for resizing
+            const resizedFileUrl = fileUrl; // Replace this with actual resizing logic if available
 
             // Transaction to update counter and add new item
             await runTransaction(db, async (transaction) => {
-                const counterDocRef = doc(db, 'counters', 'realItemCounter');
+                const counterDocRef = doc(db, 'counters', 'itemCounter');
                 const counterDoc = await transaction.get(counterDocRef);
                 if (!counterDoc.exists()) {
                     throw new Error('Counter document does not exist!');
@@ -157,7 +154,7 @@ const NewItemForm: React.FC = () => {
                 const newId = counterDoc.data().currentId + 1;
                 transaction.update(counterDocRef, { currentId: newId });
 
-                const newItemRef = doc(collection(db, 'items'));
+                const newItemRef = doc(collection(db, 'realitems'));
                 transaction.set(newItemRef, {
                     id: newId,
                     name,
@@ -255,6 +252,7 @@ const NewItemForm: React.FC = () => {
             <div className="upload-wrap">
                 <span className="chooseImage">Choose Item Image*</span>
                 <button type="button" onClick={handleGoogleSearch} className="form-group file-upload-item upload-google-image">
+                    Recommended Image
                 </button>
 
                 {imageURL && confirmImage && (

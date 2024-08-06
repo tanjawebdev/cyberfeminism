@@ -1,15 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-export default async function handler(req: { method: string; body: { imageUrl: any; name: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error?: string; fileUrl?: string; }): void; new(): any; }; }; }) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-
-    const { imageUrl, name } = req.body;
+export async function POST(req: NextRequest) {
+    const { imageUrl, name } = await req.json();
 
     if (!imageUrl || !name) {
-        return res.status(400).json({ error: 'Missing imageUrl or name' });
+        return NextResponse.json({ error: 'Missing imageUrl or name' }, { status: 400 });
     }
 
     try {
@@ -24,9 +21,9 @@ export default async function handler(req: { method: string; body: { imageUrl: a
 
         const fileUrl = await getDownloadURL(fileRef);
 
-        res.status(200).json({ fileUrl });
+        return NextResponse.json({ fileUrl });
     } catch (error) {
         console.error('Error fetching or uploading image: ', error);
-        res.status(500).json({ error: 'Error fetching or uploading image' });
+        return NextResponse.json({ error: 'Error fetching or uploading image' }, { status: 500 });
     }
 }
