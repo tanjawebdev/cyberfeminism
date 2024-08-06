@@ -124,13 +124,20 @@ const NewItemForm: React.FC = () => {
                 await uploadBytes(fileRef, file);
                 fileUrl = await getDownloadURL(fileRef);
             } else if (imageURL) {
-                // Download and upload the Google image to Firebase Storage
-                const response = await fetch(imageURL);
-                const blob = await response.blob();
-                const fileName = `${name.replace(/\s+/g, '_')}.jpg`;
-                const fileRef = ref(storage, `uploads/${fileName}`);
-                await uploadBytes(fileRef, blob);
-                fileUrl = await getDownloadURL(fileRef);
+                // Send the image URL and name to the API route
+                const response = await fetch('/api/uploadImage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ imageUrl: imageURL, name })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    fileUrl = data.fileUrl;
+                } else {
+                    throw new Error(data.error);
+                }
             }
 
             const resizedFileName = fileUrl.replace(/\.[^/.]+$/, "") + "_350x350.webp";
@@ -284,8 +291,6 @@ const NewItemForm: React.FC = () => {
                     )}
                 </div>
             </div>
-
-
 
             <h3>Your Ratings</h3>
             <div className="form-group slider">
