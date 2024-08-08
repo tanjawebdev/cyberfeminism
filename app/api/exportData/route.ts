@@ -6,7 +6,6 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { writeFileSync } from 'fs';
 import { Parser } from 'json2csv';
-import { v4 as uuidv4 } from 'uuid';
 
 const serviceAccount = require('../../../config/firebaseServiceAccountKey.json');
 
@@ -82,3 +81,4 @@ export async function GET() {
         return NextResponse.error();
     }
 }
+
