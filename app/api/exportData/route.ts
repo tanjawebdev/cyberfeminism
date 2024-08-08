@@ -7,7 +7,13 @@ import { join } from 'path';
 import { writeFileSync } from 'fs';
 import { Parser } from 'json2csv';
 
-const serviceAccount = require('../../../config/firebaseServiceAccountKey.json');
+const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+
+if (!serviceAccountBase64) {
+    throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set.');
+}
+
+const serviceAccount = JSON.parse(Buffer.from(serviceAccountBase64, 'base64').toString('utf-8'));
 
 if (!getApps().length) {
     initializeApp({
@@ -81,4 +87,3 @@ export async function GET() {
         return NextResponse.error();
     }
 }
-
