@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase'; // Importiere deine Firebase-Datenbankinstanz
 import Modal from '@components/modal/Modal';
 import '@components/modal/Modal.scss';
 import './ChangeItemModal.scss';
-
 
 interface ChangeItemModalProps {
     isOpen: boolean;
@@ -21,16 +22,28 @@ const ChangeItemModal: React.FC<ChangeItemModalProps> = ({ isOpen, onClose }) =>
         setInputValue(e.target.value);
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const value = parseInt(inputValue, 10);
         if (isNaN(value) || value < 1 || value > 999) {
             setError('Please enter a valid number between 1 and 999.');
         } else {
             setError('');
-            console.log('Submitted ID:', value);
-            onClose();
-            router.push(`/voting/edit-item?id=${value}`);
+            // Überprüfen, ob die benutzerdefinierte ID in Firebase existiert
+            const itemsRef = collection(db, 'realitems');
+            const q = query(itemsRef, where('id', '==', value));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                // Wenn das Dokument mit der benutzerdefinierten ID existiert, weiterleiten
+                console.log('Submitted ID:', value);
+                onClose();
+                router.push(`/voting/edit-item?id=${value}`);
+            } else {
+                // Wenn das Dokument nicht existiert, Fehlermeldung anzeigen und Eingabe zurücksetzen
+                setError('ID nicht vorhanden');
+                setInputValue('');
+            }
         }
     };
 
