@@ -3,13 +3,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import RedirectBasedOnWidth from '@components/redirectBasedOnWidth/RedirectBasedOnWidth';
 import Image from "next/image";
-import { collection, query, where, orderBy, onSnapshot, getDocs, doc, limit } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, getDocs, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import "@styles/home.scss";
 import HomeModal from "@components/homeModal/HomeModal";
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
-gsap.registerPlugin(ScrollTrigger);
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 interface UploadedItem {
     fileUrl: string;
@@ -30,6 +31,7 @@ interface CategoryData {
     individualSliderMinTitle: string;
     individualSliderMaxTitle: string;
     individualSliderMaxTitleShort: string;
+    individualQuestion: string;
 }
 
 export default function Home() {
@@ -64,6 +66,11 @@ export default function Home() {
     };
 
     useEffect(() => {
+        // Instantly scroll to the top of the page when the component mounts
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, []);
+
+    useEffect(() => {
         const unsubscribe = fetchItems(selectedCategory);
         return () => unsubscribe();
     }, [selectedCategory]);
@@ -82,12 +89,29 @@ export default function Home() {
         fetchCategories();
     }, []);
 
+    // GSAP animation
     useEffect(() => {
         // Clear any existing animations and scroll triggers
         gsap.killTweensOf(itemsRef.current);
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
-        // GSAP animation with ScrollTrigger
+        // Start the headline animation immediately
+        gsap.fromTo(".cat-headline",
+            {
+                opacity: 0,
+                scale: 0.8,
+                filter: 'blur(10px)'
+            },
+            {
+                opacity: 1,
+                scale: 1,
+                filter: 'blur(0px)',
+                duration: 1,
+                ease: 'power2.out'
+            }
+        );
+
+        // GSAP animation with ScrollTrigger for the rest of the elements
         if (itemsRef.current.length > 0) {
             const tl = gsap.timeline();
 
@@ -103,13 +127,33 @@ export default function Home() {
                         : `${Math.floor(Math.random() * 100) + 1}%`;
 
                     tl.to(elem, {
-                        duration: 2,
+                        duration: 1.5,
                         opacity: 1,
+                        filter: 'blur(0px)',
                         top: topPosition,
                         left: leftPosition,
                         scale: 1,
                         ease: 'power2.out'
-                    }, '-=0.3');
+                    }, '-=1');
+                }
+                if (index === 4) {
+                    tl.to(".cat-headline", {
+                        opacity: 0,
+                        scale: 0.8,
+                        filter: 'blur(10px)',
+                        duration: 1,
+                        ease: 'power2.in'
+                    }, `-=${1.5}`);
+                }
+
+                // Start fading out older elements after the 10th element
+                if (index >= 8) {
+                    const elementToFadeOut = itemsRef.current[index - 8];
+                    tl.to(elementToFadeOut, {
+                        opacity: 0,
+                        duration: 1,
+                        ease: 'power2.out'
+                    }, `-=${1.5}`);
                 }
             });
 
@@ -126,10 +170,17 @@ export default function Home() {
         }
     }, [uploadedItems]);
 
+
     const handleCategoryClick = (category: string | null) => {
-        itemsRef.current = [];
+        // Instantly scroll to the top of the page
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
+        // Clear all existing animations and triggers
         gsap.killTweensOf(itemsRef.current);
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+
+        // Update the category
+        itemsRef.current = [];
         setSelectedCategory(category);
 
         if (category) {
@@ -178,11 +229,15 @@ export default function Home() {
             <div className="home__coordinate-system">
                 <span className="left">feminist</span>
                 <span className="right">sexist</span>
-                <span className="top">top</span>
-                <span className="bottom">bottom</span>
+                <span className="top">{categoryData?.individualSliderMaxTitle || ''}</span>
+                <span className="bottom">{categoryData?.individualSliderMinTitle || ''}</span>
             </div>
             <div className="home__container">
                 <div className="home__uploadedItems">
+                    <h1 className="cat-headline">
+                        {categoryData?.individualQuestion || 'Ra(n)ting: How Sexist Is The Media?'}
+                    </h1>
+
                     {uploadedItems.map((item, index) => (
                         <div
                             key={index}
@@ -218,7 +273,7 @@ export default function Home() {
             <div className="path-bg"></div>
             <div className="home__buttons">
                 <div className={`btn btn-secondary ${selectedCategory === null ? 'active' : ''}`}
-                     onClick={() => handleCategoryClick(null)}>All</div>
+                     onClick={() => handleCategoryClick(null)}>Latest</div>
 
                 {categories.map((category) => (
                     <div key={category.id} className={`btn btn-secondary ${selectedCategory === category.id ? 'active' : ''}`}

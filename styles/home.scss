@@ -4,6 +4,17 @@
   position: relative;
   height: 100%;
   width: 100%;
+
+  h1 {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 3rem;
+    margin-top: 1rem;
+    max-width: 40vw;
+  }
 }
 
 .home__buttons {
@@ -132,6 +143,10 @@
   overflow: hidden;
 }
 
+.cat-headline {
+  opacity: 0;
+}
+
 .path-bg {
   width: 100vw;
   height: 1600vh;
@@ -145,6 +160,7 @@
   top: 50%;
   left: 50%;
   opacity: 0;
+  filter: blur(4px);
   transform: translate(-50%, -50%) scale(0.1);
 
   .item-image {
