@@ -220,7 +220,7 @@ const EditItemForm: React.FC = () => {
 
                 <div className="form-group">
                     <span>Last Change:</span>
-                    <p>{itemData.sortDate ? itemData.sortDate.toLocaleDateString() : 'N/A'}</p>
+                    <p>{itemData.sortDate ? itemData.sortDate.toLocaleDateString('de-DE') : 'N/A'}</p>
                 </div>
             </div>
 

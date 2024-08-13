@@ -1,15 +1,159 @@
 .home__uploadedItems {
   display: flex;
   flex-wrap: wrap;
+  position: relative;
+  height: 100%;
+  width: 100%;
 }
 
 .home__buttons {
   position: fixed;
   bottom: 1rem;
+
+  .btn {
+    white-space: nowrap;
+  }
 }
 
 .home__home-modal {
   position: fixed;
   top: 1rem;
   right: 1rem;
+  z-index: 2;
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .text {
+      font-size: 0.9rem;
+    }
+    .big-symbol {
+      font-family: "NeueMetana", serif;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      height: 2.5rem;
+      width: 2.5rem;
+      display: block;
+      font-size: 1.5rem;
+      line-height: 2em;
+    }
+  }
+}
+
+.home__coordinate-system {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+  font-size: 0.9rem;
+
+  &:before {
+    position: absolute;
+    content: "";
+    width: calc(100% - 8rem);
+    height: 1px;
+    background: white;
+    opacity: 0.2;
+    top: 50%;
+    left: 4rem;
+  }
+
+  &:after {
+    position: absolute;
+    content: "";
+    height:calc(100% - 10rem);
+    width: 1px;
+    background: white;
+    opacity: 0.2;
+    left: 50%;
+    top: 5rem;
+  }
+
+  .left {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    line-height: 0;
+    transform: rotate(-90deg);
+    text-transform: uppercase;
+    transform-origin: center center;
+    font-weight: 500;
+  }
+
+  .right {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    line-height: 0;
+    transform: rotate(-90deg);
+    text-transform: uppercase;
+    transform-origin: center center;
+    font-weight: 500;
+  }
+
+  .top {
+    position: absolute;
+    left: 50%;
+    top: 2rem;
+    transform: translateX(-50%);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .bottom {
+    position: absolute;
+    left: 50%;
+    bottom: 2rem;
+    transform: translateX(-50%);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+}
+
+.home__container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 5rem;
+  overflow: hidden;
+}
+
+.uploadedItem {
+  .item-image {
+    max-width: 15vw;
+    max-height: 25vh;
+  }
+
+  .item-info {
+    margin-top: 1rem;
+
+    .item-details {
+      display: flex;
+      text-transform: uppercase;
+      font-weight: 500;
+
+      &.first-line {
+        justify-content: space-between;
+      }
+
+      &.date-line {
+        font-family: "NeueMetana", serif;
+        font-size: 0.9rem;
+        opacity: 0.5;
+        font-weight: 300;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+  }
 }

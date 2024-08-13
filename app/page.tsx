@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import gsap from 'gsap';
+import React, { useEffect, useState, useRef } from 'react';
 import RedirectBasedOnWidth from '@components/redirectBasedOnWidth/RedirectBasedOnWidth';
 import Image from "next/image";
-import { collection, query, where, orderBy, onSnapshot, getDocs, doc } from 'firebase/firestore';
+import {collection, query, where, orderBy, onSnapshot, getDocs, doc, limit} from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import "@styles/home.scss";
 import HomeModal from "@components/homeModal/HomeModal";
@@ -23,6 +24,10 @@ interface UploadedItem {
 interface CategoryData {
     id: string;
     categoryName: string;
+    individualSliderHeadline: string;
+    individualSliderMinTitle: string;
+    individualSliderMaxTitle: string;
+    individualSliderMaxTitleShort: string;
 }
 
 export default function Home() {
@@ -30,14 +35,15 @@ export default function Home() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [isHomeModalOpen, setHomeModalOpen] = useState<boolean>(false);
     const [categories, setCategories] = useState<CategoryData[]>([]);
+    const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
 
     const fetchItems = (category: string | null) => {
         const itemsRef = collection(db, 'realitems');
         let q;
         if (category) {
-            q = query(itemsRef, where('category', '==', category), orderBy('sortDate', 'desc'));
+            q = query(itemsRef, where('category', '==', category), orderBy('sortDate', 'desc'), limit(15));
         } else {
-            q = query(itemsRef, orderBy('sortDate', 'desc'));
+            q = query(itemsRef, orderBy('sortDate', 'desc'), limit(15));
         }
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -65,8 +71,8 @@ export default function Home() {
             const categorySnapshot = await getDocs(categoriesRef);
             const categories: CategoryData[] = categorySnapshot.docs.map((doc) => ({
                 id: doc.id,
-                categoryName: doc.data().categoryName,
-            }));
+                ...doc.data(),
+            })) as CategoryData[];
             setCategories(categories);
         };
 
@@ -75,6 +81,12 @@ export default function Home() {
 
     const handleCategoryClick = (category: string | null) => {
         setSelectedCategory(category);
+        if (category) {
+            const selectedCategoryData = categories.find(cat => cat.id === category);
+            setCategoryData(selectedCategoryData || null);
+        } else {
+            setCategoryData(null);
+        }
     };
 
     const handleOpenHomeModal = () => {
@@ -90,45 +102,75 @@ export default function Home() {
         return category ? category.categoryName : 'Unknown';
     };
 
+    const getCategoryMaxTitle = (categoryId: string): string => {
+        const category = categories.find(cat => cat.id === categoryId);
+        return category ? category.individualSliderMaxTitle : 'Unknown';
+    };
+
     return (
         <main className="home">
-            <RedirectBasedOnWidth />
-            <div>Startscreen</div>
-            <div className="home__home-modal">
-                <div className="btn btn-primary g-col" onClick={handleOpenHomeModal}>edit or add items</div>
+            <RedirectBasedOnWidth/>
+            <div className="logo">
+                <Image
+                    src="/icons/logo.svg"
+                    alt="Logo"
+                    width={160}
+                    height={70}
+                />
             </div>
-            <div className="container">
-                <div className="home__uploadedItems grid">
+            <div className="home__home-modal">
+                <div className="btn btn-textlink" onClick={handleOpenHomeModal}>
+                    <span className="text">how to edit or add items</span>
+                    <span className="big-symbol">?</span>
+                </div>
+            </div>
+            <div className="home__coordinate-system">
+                <span className="left">feminist</span>
+                <span className="right">sexist</span>
+                <span className="top">top</span>
+                <span className="bottom">bottom</span>
+            </div>
+            <div className="home__container">
+                <div className="home__uploadedItems">
                     {uploadedItems.map((item, index) => (
                         <div key={index} className="uploadedItem">
-                            <Image
-                                src={item.fileUrl}
-                                alt={`Uploaded Item ${index + 1}`}
-                                width={200}
-                                height={200}
-                            />
-                            <p>Category: {item.category}</p>
-                            <p>Category Name: {getCategoryName(item.category)}</p>
-                            <p>Rating: {item.rating}</p>
-                            <p>Individual Rating: {item.individualRating}</p>
-                            <p>Number of Ratings: {item.allRatings.length}</p>
-                            <p>ID: {item.id}</p>
-                            <p>Sort Date: {item.sortDate?.toLocaleDateString()}</p>
-                        </div>
-                    ))}
-                </div>
-                <div className="home__buttons grid">
-                    <div className="btn btn-secondary g-col" onClick={() => handleCategoryClick(null)}>All</div>
-                    {categories.map((category) => (
-                        <div key={category.id} className="btn btn-secondary g-col"
-                             onClick={() => handleCategoryClick(category.id)}>
-                            {category.categoryName}
+                             <img src={item.fileUrl} alt="Logo" className="item-image"/>
+
+                            <div className="item-info">
+                                <div className="item-details first-line">
+                                    <p>⌀ Rating ({item.allRatings.length}):</p>
+                                    <p>ID: {item.id}</p>
+                                </div>
+                                <div className="item-details second-line">
+                                    <p>{item.rating}% sexist</p>
+                                    {categoryData && (
+                                        <p>
+                                            , {item.individualRating}% {categoryData?.individualSliderMaxTitleShort}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="item-details date-line">
+                                    <p>{item.sortDate?.toLocaleDateString('de-DE')}</p>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
 
-                <HomeModal isOpen={isHomeModalOpen} onClose={handleCloseHomeModal}/>
             </div>
+            <div className="home__buttons">
+                <div className={`btn btn-secondary ${selectedCategory === null ? 'active' : ''}`}
+                     onClick={() => handleCategoryClick(null)}>All</div>
+
+                {categories.map((category) => (
+                    <div key={category.id} className={`btn btn-secondary ${selectedCategory === category.id ? 'active' : ''}`}
+                         onClick={() => handleCategoryClick(category.id)}>
+                        {category.categoryName}
+                    </div>
+                ))}
+            </div>
+
+            <HomeModal isOpen={isHomeModalOpen} onClose={handleCloseHomeModal}/>
         </main>
     );
 }
