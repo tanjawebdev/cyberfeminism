@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
 import RedirectBasedOnWidth from '@components/redirectBasedOnWidth/RedirectBasedOnWidth';
 import Image from "next/image";
 import { collection, query, where, orderBy, onSnapshot, getDocs, limit } from 'firebase/firestore';
@@ -41,6 +41,9 @@ export default function Home() {
     const [categories, setCategories] = useState<CategoryData[]>([]);
     const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
     const itemsRef = useRef<HTMLDivElement[]>([]);
+    const [categoryAnimate, setCategoryAnimate] = useState(false);
+    const [latestAnimate, setLatestAnimate] = useState(false);
+
 
     const fetchItems = (category: string | null) => {
         const itemsRef = collection(db, 'realitems');
@@ -72,6 +75,11 @@ export default function Home() {
 
     useEffect(() => {
         const unsubscribe = fetchItems(selectedCategory);
+
+        if (!selectedCategory) {
+            setLatestAnimate(true);
+        }
+
         return () => unsubscribe();
     }, [selectedCategory]);
 
@@ -90,10 +98,13 @@ export default function Home() {
     }, []);
 
     // GSAP animation
-    useEffect(() => {
+    const animateItems = useCallback(() => {
+        console.log('ANIMATE ITEMS');
+
         // Clear any existing animations and scroll triggers
         gsap.killTweensOf(itemsRef.current);
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+
 
         // Start the headline animation immediately
         gsap.fromTo(".cat-headline",
@@ -111,6 +122,9 @@ export default function Home() {
             }
         );
 
+        console.log('testttt' + itemsRef.current.length); // is always 0
+
+
         // GSAP animation with ScrollTrigger for the rest of the elements
         if (itemsRef.current.length > 0) {
             const tl = gsap.timeline();
@@ -125,6 +139,8 @@ export default function Home() {
                     const leftPosition = item.rating
                         ? `${item.rating}%`
                         : `${Math.floor(Math.random() * 100) + 1}%`;
+
+                    console.log(`${item.id}: ${leftPosition}% ${topPosition}%`); // these items have the values of the active items a click before. I need the new once. Does that have to do something with the callback?
 
                     tl.fromTo(elem,
                         {
@@ -181,6 +197,91 @@ export default function Home() {
             ScrollTrigger.refresh();
         }
     }, [uploadedItems]);
+
+    const animateLatest = useCallback(() => {
+        console.log('ANIMATE LATEST');
+        // Clear any existing animations and scroll triggers
+        gsap.killTweensOf(itemsRef.current);
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+
+
+        // Start the headline animation immediately
+        gsap.fromTo(".cat-headline",
+            {
+                opacity: 0,
+                scale: 0.8,
+                filter: 'blur(10px)'
+            },
+            {
+                opacity: 1,
+                scale: 1,
+                filter: 'blur(0px)',
+                duration: 1,
+                ease: 'power2.out'
+            }
+        );
+
+        console.log('testttt' + itemsRef.current.length); // is always 0
+
+
+        // GSAP animation with ScrollTrigger for the rest of the elements
+        if (itemsRef.current.length > 0) {
+            const tlhome = gsap.timeline();
+
+            itemsRef.current.forEach((elem, index) => {
+                const item = uploadedItems[index];
+                if (item) {
+                    const leftPosition = item.rating
+                        ? `${item.rating}%`
+                        : `${Math.floor(Math.random() * 100) + 1}%`;
+
+                    let randomPosition = 0;
+                    if (item.rating > 25 && item.rating < 75) {
+                        // Generate a random number between 0-35 or 80-100
+                        randomPosition = Math.random() < 0.5 ?
+                            Math.floor(Math.random() * 25) :  // 0-35
+                            Math.floor(Math.random() * 20) + 80;  // 80-100
+                    } else {
+                        randomPosition = Math.floor(Math.random() * 100) + 1;
+                    }
+                    const topPosition = `${randomPosition}%`;
+
+                    console.log(`${item.id}: ${leftPosition}% ${topPosition}%`); // these items have the values of the active items a click before. I need the new once. Does that have to do something with the callback?
+
+                    tlhome.fromTo(elem,
+                        {
+                            top: topPosition,
+                            left: leftPosition,
+                            opacity: 0,
+                            filter: 'blur(4px)',
+                            scale: 0.75,
+                            pointerEvents: 'none'
+                        },
+                        {
+                            duration: 1,
+                            opacity: 1,
+                            filter: 'blur(0px)',
+                            scale: 1,
+                            pointerEvents: 'all',
+                            ease: 'power2.out',
+                        }, '-=0.75');
+                }
+            });
+        }
+    }, [uploadedItems]);
+
+    useEffect(() => {
+        if (categoryAnimate && uploadedItems.length > 0) {
+            animateItems();
+            //setCategoryAnimate(false);
+        }
+    }, [categoryAnimate, uploadedItems, animateItems]);
+
+    useEffect(() => {
+        if (latestAnimate && uploadedItems.length > 0) {
+            animateLatest();
+        }
+    }, [latestAnimate, uploadedItems, animateLatest]);
 
     // Hover animation for uploaded items
     const handleMouseEnter = (index: number) => {
@@ -243,6 +344,17 @@ export default function Home() {
         } else {
             setCategoryData(null);
         }
+
+        // Fetch items and animate them
+        fetchItems(category);
+
+        if (category) {
+            setCategoryAnimate(true);
+            setLatestAnimate(false);
+        } else {
+            setLatestAnimate(true);
+            setCategoryAnimate(false);
+        }
     };
 
     const handleOpenHomeModal = () => {
@@ -265,7 +377,7 @@ export default function Home() {
 
     return (
         <main className="home">
-            <RedirectBasedOnWidth />
+            <RedirectBasedOnWidth/>
             <div className="home__logo">
                 <Image
                     src="/icons/logo.svg"
@@ -327,13 +439,21 @@ export default function Home() {
                     ))}
                 </div>
             </div>
-            <div className="path-bg"></div>
+            <div className={`path-bg ${latestAnimate ? 'path-bg-small' : ''}`}></div>
+            <div className="bg-video">
+                <video autoPlay loop muted playsInline>
+                    <source src="/loop.mp4" type="video/mp4"/>
+                    Your browser does not support the video tag.
+                </video>
+            </div>
             <div className="home__buttons">
                 <div className={`btn btn-secondary ${selectedCategory === null ? 'active' : ''}`}
-                     onClick={() => handleCategoryClick(null)}>Latest</div>
+                     onClick={() => handleCategoryClick(null)}>Latest
+                </div>
 
                 {categories.map((category) => (
-                    <div key={category.id} className={`btn btn-secondary ${selectedCategory === category.id ? 'active' : ''}`}
+                    <div key={category.id}
+                         className={`btn btn-secondary ${selectedCategory === category.id ? 'active' : ''}`}
                          onClick={() => handleCategoryClick(category.id)}>
                         {category.categoryName}
                     </div>

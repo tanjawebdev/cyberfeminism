@@ -24,6 +24,13 @@
 
   .btn {
     white-space: nowrap;
+    backdrop-filter: blur(4px);
+    background: #ffffff1c;
+    border: none;
+
+    &.active {
+      background: white;
+    }
   }
 }
 
@@ -154,6 +161,26 @@
   pointer-events: none;
 }
 
+.path-bg-small {
+  height: 100vh;
+}
+
+.bg-video {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: -1;
+
+  video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
 .uploadedItem {
   position: absolute;
   width: 10vw;
@@ -163,6 +190,8 @@
   opacity: 0;
   filter: blur(4px);
   transform: translate(-50%, -50%) scale(0.1);
+  display: flex;
+  flex-direction: column;
 
   .item-image {
     max-width: 10vw;
