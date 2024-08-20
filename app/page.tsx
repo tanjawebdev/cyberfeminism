@@ -427,7 +427,7 @@ export default function Home() {
                                     <p>{item.rating}% sexist</p>
                                     {categoryData && (
                                         <p>
-                                            , {item.individualRating}% {categoryData?.individualSliderMaxTitleShort}
+                                            {item.individualRating}% {categoryData?.individualSliderMaxTitleShort}
                                         </p>
                                     )}
                                 </div>

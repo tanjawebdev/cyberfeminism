@@ -42,8 +42,8 @@
 
 .home__home-modal {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
+  top: 0;
+  right: 0;
   z-index: 2;
 
   .btn {
@@ -183,7 +183,7 @@
 
 .uploadedItem {
   position: absolute;
-  width: 10vw;
+  width: 7vw;
   height: auto;
   top: 50%;
   left: 50%;
@@ -194,7 +194,7 @@
   flex-direction: column;
 
   .item-image {
-    max-width: 10vw;
+    max-width: 7vw;
     max-height: 18vh;
   }
 
@@ -205,21 +205,27 @@
       display: flex;
       text-transform: uppercase;
       font-weight: 500;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
+      line-height: 1.3em;
 
       &.first-line {
         justify-content: space-between;
       }
 
+      &.second-line {
+        flex-direction: column;
+      }
+
       &.date-line {
         font-family: "NeueMetana", serif;
-        font-size: 0.7rem;
+        font-size: 0.6rem;
         opacity: 0.5;
         font-weight: 300;
       }
 
       p {
         margin: 0;
+        white-space: nowrap;
       }
     }
   }
