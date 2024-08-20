@@ -126,15 +126,26 @@ export default function Home() {
                         ? `${item.rating}%`
                         : `${Math.floor(Math.random() * 100) + 1}%`;
 
-                    tl.to(elem, {
-                        duration: 1.5,
-                        opacity: 1,
-                        filter: 'blur(0px)',
-                        top: topPosition,
-                        left: leftPosition,
-                        scale: 1,
-                        ease: 'power2.out'
-                    }, '-=1');
+                    tl.fromTo(elem,
+                        {
+                            top: '50%',
+                            left: '50%',
+                            opacity: 0,
+                            filter: 'blur(4px)',
+                            scale: 0.1,
+                            transform: 'translate(-50%, -50%)',
+                            pointerEvents: 'none'
+                        },
+                        {
+                            duration: 1.5,
+                            opacity: 1,
+                            filter: 'blur(0px)',
+                            top: topPosition,
+                            left: leftPosition,
+                            scale: 1,
+                            pointerEvents: 'all',
+                            ease: 'power2.out',
+                        }, '-=1');
                 }
                 if (index === 4) {
                     tl.to(".cat-headline", {
@@ -170,6 +181,48 @@ export default function Home() {
         }
     }, [uploadedItems]);
 
+    // Hover animation for uploaded items
+    const handleMouseEnter = (index: number) => {
+        // Scale and highlight the hovered item
+        gsap.to(itemsRef.current[index], {
+            scale: 1.2,
+            opacity: 1,
+            filter: 'blur(0px), brightness()',
+            zIndex: 10,
+            duration: 0.3,
+            ease: 'power2.out'
+        });
+
+        // Darken all other items
+        itemsRef.current.forEach((elem, i) => {
+            if (i !== index) {
+                gsap.to(elem, {
+                    filter: 'brightness(50%)',
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            }
+        });
+    };
+
+    const handleMouseLeave = (index: number) => {
+        // Reset the hovered item
+        gsap.to(itemsRef.current[index], {
+            scale: 1,
+            zIndex: 1,
+            duration: 0.3,
+            ease: 'power2.out'
+        });
+
+        // Reset all other items
+        itemsRef.current.forEach((elem, i) => {
+            gsap.to(elem, {
+                filter: 'brightness(100%)',
+                duration: 0.3,
+                ease: 'power2.out'
+            });
+        });
+    };
 
     const handleCategoryClick = (category: string | null) => {
         // Instantly scroll to the top of the page
@@ -246,7 +299,10 @@ export default function Home() {
                                 if (el) {
                                     itemsRef.current[index] = el;
                                 }
-                            }}>
+                            }}
+                            onMouseEnter={() => handleMouseEnter(index)}
+                            onMouseLeave={() => handleMouseLeave(index)}
+                        >
                             <img src={item.fileUrl} alt="Logo" className="item-image"/>
 
                             <div className="item-info">
