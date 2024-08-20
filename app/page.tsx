@@ -162,6 +162,7 @@ export default function Home() {
                     const elementToFadeOut = itemsRef.current[index - 8];
                     tl.to(elementToFadeOut, {
                         opacity: 0,
+                        pointerEvents: 'none',
                         duration: 1,
                         ease: 'power2.out'
                     }, `-=${1.5}`);
