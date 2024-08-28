@@ -107,7 +107,7 @@ export default function Home() {
 
 
         // Start the headline animation immediately
-        gsap.fromTo(".cat-headline",
+        gsap.fromTo(".headertext",
             {
                 opacity: 0,
                 scale: 0.8,
@@ -136,11 +136,11 @@ export default function Home() {
                         ? `calc(100% - ${item.individualRating}%)`
                         : `${Math.floor(Math.random() * 100) + 1}%`;
 
-                    const leftPosition = item.rating
+                    const leftPosition = item.rating != null && item.rating !== undefined
                         ? `${item.rating}%`
                         : `${Math.floor(Math.random() * 100) + 1}%`;
 
-                    console.log(`${item.id}: ${leftPosition}% ${topPosition}%`); // these items have the values of the active items a click before. I need the new once. Does that have to do something with the callback?
+                    console.log(`${item.id}: ${leftPosition}% ${topPosition}%`);
 
                     tl.fromTo(elem,
                         {
@@ -159,12 +159,14 @@ export default function Home() {
                             top: topPosition,
                             left: leftPosition,
                             scale: 1,
-                            pointerEvents: 'all',
                             ease: 'power2.out',
+                            onComplete: () => {
+                                elem.style.pointerEvents = 'all';
+                            }
                         }, '-=1');
                 }
                 if (index === 4) {
-                    tl.to(".cat-headline", {
+                    tl.to(".headertext", {
                         opacity: 0,
                         scale: 0.8,
                         filter: 'blur(10px)',
@@ -189,6 +191,20 @@ export default function Home() {
                 animation: tl,
                 trigger: ".path-bg",
                 start: "top top",
+                end: "bottom bottom",
+                onLeave: () => {
+                    const categories = ['option1', 'option2', 'option3', 'option4', 'option5'];
+                    if (selectedCategory != null) {
+                        const headerTextElement = document.querySelector('.headertext') as HTMLElement;
+                        if (headerTextElement) {
+                            headerTextElement.style.opacity = '0';
+                        }
+                        const currentIndex = categories.indexOf(selectedCategory);
+                        const nextIndex = (currentIndex + 1) % categories.length;
+                        const nextCategory = categories[nextIndex];
+                        handleCategoryClick(nextCategory);
+                    }
+                },
                 scrub: 2,
                 anticipatePin: 1
             });
@@ -206,7 +222,7 @@ export default function Home() {
 
 
         // Start the headline animation immediately
-        gsap.fromTo(".cat-headline",
+        gsap.fromTo(".headertext",
             {
                 opacity: 0,
                 scale: 0.8,
@@ -231,7 +247,7 @@ export default function Home() {
             itemsRef.current.forEach((elem, index) => {
                 const item = uploadedItems[index];
                 if (item) {
-                    const leftPosition = item.rating
+                    const leftPosition = item.rating != null && item.rating !== undefined
                         ? `${item.rating}%`
                         : `${Math.floor(Math.random() * 100) + 1}%`;
 
@@ -327,6 +343,11 @@ export default function Home() {
     };
 
     const handleCategoryClick = (category: string | null) => {
+        const headerTextElement = document.querySelector('.headertext') as HTMLElement;
+        if (headerTextElement) {
+            headerTextElement.style.opacity = '0';
+        }
+
         // Instantly scroll to the top of the page
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
@@ -365,6 +386,10 @@ export default function Home() {
         setHomeModalOpen(false);
     };
 
+    const startScrolling = () => {
+        window.scrollTo({ top: 3000, left: 0, behavior: 'smooth' });
+    };
+
     const getCategoryName = (categoryId: string): string => {
         const category = categories.find(cat => cat.id === categoryId);
         return category ? category.categoryName : 'Unknown';
@@ -400,9 +425,38 @@ export default function Home() {
             </div>
             <div className="home__container">
                 <div className="home__uploadedItems">
-                    <h1 className="cat-headline">
-                        {categoryData?.individualQuestion || 'Ra(n)ting: How Sexist Is The Media?'}
-                    </h1>
+                    <div className="headertext">
+                        {selectedCategory === null ?
+                            <span className="cat-summary">
+                                Your latest submissions
+                            </span>
+                         : ''}
+
+                        <h1 className="cat-headline">
+                            {categoryData?.individualQuestion || 'Ra(n)ting: How Sexist Is The Media?'}
+                        </h1>
+
+                        {selectedCategory === null ?
+                            <button className="btn btn-primary"
+                                    onClick={() => handleCategoryClick("option1")}>
+                                Start Exploring
+                            </button>
+                        :
+                            <div className="scroll-hint"
+                            onClick={startScrolling}>
+                                <span>
+                                    Scroll through submissions
+                                </span>
+
+                                <svg className="arrows">
+                                    <path className="a1" d="M0 0 L30 32 L60 0"></path>
+                                    <path className="a2" d="M0 20 L30 52 L60 20"></path>
+                                    <path className="a3" d="M0 40 L30 72 L60 40"></path>
+                                </svg>
+                            </div>
+                        }
+                    </div>
+
 
                     {uploadedItems.map((item, index) => (
                         <div

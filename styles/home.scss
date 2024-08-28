@@ -5,15 +5,83 @@
   height: 100%;
   width: 100%;
 
-  h1 {
+  .headertext {
+    opacity: 0;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    font-size: 3rem;
     margin-top: 1rem;
     max-width: 40vw;
+
+    .cat-summary {
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+
+    h1 {
+      font-size: 3rem;
+    }
+
+    button {
+      margin-top: 1rem;
+    }
+
+    .scroll-hint {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      margin-top: 2rem;
+      cursor: pointer;
+
+      .arrows {
+        width: 60px;
+        height: 72px;
+        transform: scale(0.6);
+      }
+
+      .arrows path {
+        stroke: white;
+        fill: transparent;
+        stroke-width: 1px;
+        animation: arrow 2s infinite;
+        -webkit-animation: arrow 2s infinite;
+      }
+
+      @keyframes arrow
+      {
+        0% {opacity:0}
+        40% {opacity:1}
+        80% {opacity:0}
+        100% {opacity:0}
+      }
+
+      @-webkit-keyframes arrow /*Safari and Chrome*/
+      {
+        0% {opacity:0}
+        40% {opacity:1}
+        80% {opacity:0}
+        100% {opacity:0}
+      }
+
+      .arrows path.a1 {
+        animation-delay:-1s;
+        -webkit-animation-delay:-1s; /* Safari 和 Chrome */
+      }
+
+      .arrows path.a2 {
+        animation-delay:-0.5s;
+        -webkit-animation-delay:-0.5s; /* Safari 和 Chrome */
+      }
+
+      .arrows path.a3 {
+        animation-delay:0s;
+        -webkit-animation-delay:0s; /* Safari 和 Chrome */
+      }
+    }
   }
 }
 
@@ -149,10 +217,6 @@
   height: 100%;
   padding: 8%;
   overflow: hidden;
-}
-
-.cat-headline {
-  opacity: 0;
 }
 
 .path-bg {
