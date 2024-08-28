@@ -74,6 +74,8 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
+        console.log('fetchItems');
+        console.log(selectedCategory);
         const unsubscribe = fetchItems(selectedCategory);
 
         if (!selectedCategory) {
@@ -367,7 +369,7 @@ export default function Home() {
         }
 
         // Fetch items and animate them
-        fetchItems(category);
+        const unsubscribe = fetchItems(category);
 
         if (category) {
             setCategoryAnimate(true);
@@ -376,6 +378,7 @@ export default function Home() {
             setLatestAnimate(true);
             setCategoryAnimate(false);
         }
+        return () => unsubscribe();
     };
 
     const handleOpenHomeModal = () => {
@@ -458,7 +461,10 @@ export default function Home() {
                     </div>
 
 
-                    {uploadedItems.map((item, index) => (
+                    {uploadedItems.map((item, index) => {
+                        console.log('Image URL:', item.fileUrl);
+
+                        return (
                         <div
                             key={index}
                             className="uploadedItem"
@@ -469,8 +475,18 @@ export default function Home() {
                             }}
                             onMouseEnter={() => handleMouseEnter(index)}
                             onMouseLeave={() => handleMouseLeave(index)}
+                            style={{ opacity: 0 }}
                         >
-                            <img src={item.fileUrl} alt="Logo" className="item-image"/>
+                            <img src={item.fileUrl}
+                                 alt="Logo"
+                                 className="item-image"
+                                 onLoad={(e) => {
+                                     const element = itemsRef.current[index];
+                                     if (element) {
+                                         gsap.to(element, { opacity: 1, duration: 0.5 });
+                                     }
+                                 }}
+                            />
 
                             <div className="item-info">
                                 <div className="item-details first-line">
@@ -490,7 +506,8 @@ export default function Home() {
                                 </div>
                             </div>
                         </div>
-                    ))}
+                        );
+                    })};
                 </div>
             </div>
             <div className={`path-bg ${latestAnimate ? 'path-bg-small' : ''}`}></div>
