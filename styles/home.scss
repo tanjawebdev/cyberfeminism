@@ -136,6 +136,18 @@
   }
 }
 
+.home__home-pager {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+
+  .number {
+    font-family: "NeueMetana", serif;
+    font-size: 1.6rem;
+    margin-left: 10px;
+  }
+}
+
 .home__coordinate-system {
   height: 100%;
   width: 100%;

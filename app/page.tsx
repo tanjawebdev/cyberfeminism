@@ -426,6 +426,10 @@ export default function Home() {
                 <span className="top">{categoryData?.individualSliderMaxTitle || ''}</span>
                 <span className="bottom">{categoryData?.individualSliderMinTitle || ''}</span>
             </div>
+            <div className="home__home-pager">
+                    <span className="text">Most recent items shown:</span>
+                    <span className="number">15</span>
+            </div>
             <div className="home__container">
                 <div className="home__uploadedItems">
                     <div className="headertext">
@@ -433,7 +437,7 @@ export default function Home() {
                             <span className="cat-summary">
                                 Your latest submissions
                             </span>
-                         : ''}
+                            : ''}
 
                         <h1 className="cat-headline">
                             {categoryData?.individualQuestion || 'Ra(n)ting: How Sexist Is The Media?'}
@@ -444,9 +448,9 @@ export default function Home() {
                                     onClick={() => handleCategoryClick("option1")}>
                                 Start Exploring
                             </button>
-                        :
+                            :
                             <div className="scroll-hint"
-                            onClick={startScrolling}>
+                                 onClick={startScrolling}>
                                 <span>
                                     Scroll through submissions
                                 </span>
@@ -463,47 +467,47 @@ export default function Home() {
 
                     {uploadedItems.map((item, index) => {
                         return (
-                        <div
-                            key={index}
-                            className="uploadedItem"
-                            ref={(el) => {
-                                if (el) {
-                                    itemsRef.current[index] = el;
-                                }
-                            }}
-                            onMouseEnter={() => handleMouseEnter(index)}
-                            onMouseLeave={() => handleMouseLeave(index)}
-                            style={{ visibility: 'hidden' }}
-                        >
-                            <img src={item.fileUrl}
-                                 alt="Logo"
-                                 className="item-image"
-                                 onLoad={(e) => {
-                                     const element = itemsRef.current[index];
-                                     if (element) {
-                                         gsap.to(element, { visibility: 'visible' });
-                                     }
-                                 }}
-                            />
+                            <div
+                                key={index}
+                                className="uploadedItem"
+                                ref={(el) => {
+                                    if (el) {
+                                        itemsRef.current[index] = el;
+                                    }
+                                }}
+                                onMouseEnter={() => handleMouseEnter(index)}
+                                onMouseLeave={() => handleMouseLeave(index)}
+                                style={{visibility: 'hidden'}}
+                            >
+                                <img src={item.fileUrl}
+                                     alt="Logo"
+                                     className="item-image"
+                                     onLoad={(e) => {
+                                         const element = itemsRef.current[index];
+                                         if (element) {
+                                             gsap.to(element, {visibility: 'visible'});
+                                         }
+                                     }}
+                                />
 
-                            <div className="item-info">
-                                <div className="item-details first-line">
-                                    <p>⌀ Rating ({item.allRatings.length}):</p>
-                                    <p>ID: {item.id}</p>
-                                </div>
-                                <div className="item-details second-line">
-                                    <p>{item.rating}% sexist</p>
-                                    {categoryData && (
-                                        <p>
-                                            {item.individualRating}% {categoryData?.individualSliderMaxTitleShort}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="item-details date-line">
-                                    <p>{item.sortDate?.toLocaleDateString('de-DE')}</p>
+                                <div className="item-info">
+                                    <div className="item-details first-line">
+                                        <p>⌀ Rating ({item.allRatings.length}):</p>
+                                        <p>ID: {item.id}</p>
+                                    </div>
+                                    <div className="item-details second-line">
+                                        <p>{item.rating}% sexist</p>
+                                        {categoryData && (
+                                            <p>
+                                                {item.individualRating}% {categoryData?.individualSliderMaxTitleShort}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="item-details date-line">
+                                        <p>{item.sortDate?.toLocaleDateString('de-DE')}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         );
                     })}
                 </div>
