@@ -475,7 +475,7 @@ export default function Home() {
                             }}
                             onMouseEnter={() => handleMouseEnter(index)}
                             onMouseLeave={() => handleMouseLeave(index)}
-                            style={{ opacity: 0 }}
+                            style={{ visibility: 'hidden' }}
                         >
                             <img src={item.fileUrl}
                                  alt="Logo"
@@ -483,7 +483,7 @@ export default function Home() {
                                  onLoad={(e) => {
                                      const element = itemsRef.current[index];
                                      if (element) {
-                                         gsap.to(element, { opacity: 1, duration: 0.5 });
+                                         gsap.to(element, { visibility: 'visible' });
                                      }
                                  }}
                             />
