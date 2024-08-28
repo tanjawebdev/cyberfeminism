@@ -462,8 +462,6 @@ export default function Home() {
 
 
                     {uploadedItems.map((item, index) => {
-                        console.log('Image URL:', item.fileUrl);
-
                         return (
                         <div
                             key={index}
@@ -507,7 +505,7 @@ export default function Home() {
                             </div>
                         </div>
                         );
-                    })};
+                    })}
                 </div>
             </div>
             <div className={`path-bg ${latestAnimate ? 'path-bg-small' : ''}`}></div>

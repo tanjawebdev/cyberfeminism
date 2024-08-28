@@ -31,6 +31,18 @@
   p {
     margin: 0;
   }
+
+  .content {
+    display: flex;
+    gap: 1.5rem;
+    text-align: left;
+    align-items: center;
+
+    .qr {
+      height: 5rem;
+      width: 5rem;
+    }
+  }
 }
 
 .closeButton {

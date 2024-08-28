@@ -15,7 +15,10 @@ const HomeModal: React.FC<ChangeItemModalProps> = ({ isOpen, onClose }) => {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <p>To contribute to the installation, you have to open the website on a mobile device, or scan the QR code to the right</p>
+            <div className="content">
+                <img src="qr.png" className="qr" />
+                <p>To contribute to the installation, you have to open the website on a mobile device, or scan the QR code on the left.</p>
+            </div>
         </Modal>
     );
 };
