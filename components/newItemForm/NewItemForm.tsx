@@ -21,7 +21,7 @@ interface CategoryData {
 }
 
 interface ExistingItem {
-    id: string;  // This should be your custom ID
+    id: string;
     name: string;
 }
 
@@ -126,6 +126,20 @@ const NewItemForm: React.FC = () => {
         setIndividualSliderValue(parseInt(e.target.value, 10));
     };
 
+    const generateRandomSliderValue = (sliderValue: number): number => {
+        let randomPosition = 0;
+        if (sliderValue > 25 && sliderValue < 75) {
+            // Generate a random number between 0-25 or 80-100
+            randomPosition = Math.random() < 0.5 ?
+                Math.floor(Math.random() * 25) :  // 0-25
+                Math.floor(Math.random() * 20) + 80;  // 80-100
+        } else {
+            randomPosition = Math.floor(Math.random() * 100) + 1;
+        }
+        return randomPosition;
+    };
+
+
     const handleEditExisting = () => {
         if (closestMatchId) {
             router.push(`/voting/edit-item?id=${closestMatchId}`);
@@ -154,6 +168,8 @@ const NewItemForm: React.FC = () => {
             alert('Please enter a name.');
             return;
         }
+
+        const randomPosition = generateRandomSliderValue(sliderValue);
 
         setUploading(true);
 
@@ -204,6 +220,7 @@ const NewItemForm: React.FC = () => {
                     category: dropdownValue,
                     rating: sliderValue,
                     individualRating: individualSliderValue,
+                    randomRating: randomPosition,
                     createdAt: new Date(),
                     sortDate: new Date(),
                     allRatings: [sliderValue],

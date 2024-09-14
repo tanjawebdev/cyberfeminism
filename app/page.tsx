@@ -17,6 +17,7 @@ interface UploadedItem {
     category: string;
     rating: number;
     individualRating: number;
+    randomRating: number;
     id: number;
     createdAt: Date;
     editedAt: Date;
@@ -253,16 +254,10 @@ export default function Home() {
                         ? `${item.rating}%`
                         : `${Math.floor(Math.random() * 100) + 1}%`;
 
-                    let randomPosition = 0;
-                    if (item.rating > 25 && item.rating < 75) {
-                        // Generate a random number between 0-35 or 80-100
-                        randomPosition = Math.random() < 0.5 ?
-                            Math.floor(Math.random() * 25) :  // 0-35
-                            Math.floor(Math.random() * 20) + 80;  // 80-100
-                    } else {
-                        randomPosition = Math.floor(Math.random() * 100) + 1;
-                    }
-                    const topPosition = `${randomPosition}%`;
+                    const topPosition = item.randomRating != null && item.randomRating !== undefined
+                        ? `${item.randomRating}%`
+                        : `${Math.floor(Math.random() * 100) + 1}%`;
+
 
                     console.log(`${item.id}: ${leftPosition}% ${topPosition}%`); // these items have the values of the active items a click before. I need the new once. Does that have to do something with the callback?
 
