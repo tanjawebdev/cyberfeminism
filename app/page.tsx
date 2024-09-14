@@ -37,6 +37,7 @@ interface CategoryData {
 
 export default function Home() {
     const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([]);
+    const [previousItems, setPreviousItems] = useState<UploadedItem[]>([]); // Track previous items
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [isHomeModalOpen, setHomeModalOpen] = useState<boolean>(false);
     const [categories, setCategories] = useState<CategoryData[]>([]);
@@ -44,6 +45,7 @@ export default function Home() {
     const itemsRef = useRef<HTMLDivElement[]>([]);
     const [categoryAnimate, setCategoryAnimate] = useState(false);
     const [latestAnimate, setLatestAnimate] = useState(false);
+    const [isFirstLoad, setIsFirstLoad] = useState(true); // New state for first load tracking
 
 
     const fetchItems = (category: string | null) => {
@@ -56,14 +58,32 @@ export default function Home() {
         }
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            const items = snapshot.docs.map((doc) => {
+            const newItems = snapshot.docs.map((doc) => {
                 const data = doc.data();
                 return {
                     ...data,
                     sortDate: data.sortDate?.toDate(),
                 } as UploadedItem;
             });
-            setUploadedItems(items);
+
+            // Check for new items by comparing with the previous items state
+            if (!isFirstLoad) {
+                const addedItems = newItems.filter(newItem =>
+                    !previousItems.some(prevItem => prevItem.id === newItem.id)
+                );
+                if (addedItems.length > 0) {
+                    animateNewItems(addedItems); // Animate only the newly added items
+                }
+            }
+
+            setUploadedItems(newItems);
+            setPreviousItems(newItems); // Update the previous items for comparison
+
+            // First load handling or when 'Latest' is clicked
+            if (isFirstLoad || category === null || category === '') {
+                setIsFirstLoad(false); // Mark that the first load has completed
+                setLatestAnimate(true); // Trigger animation for latest items
+            }
         });
 
         return () => unsubscribe();
@@ -78,6 +98,10 @@ export default function Home() {
         console.log('fetchItems');
         console.log(selectedCategory);
         const unsubscribe = fetchItems(selectedCategory);
+
+        // maybe change here
+        // only setLatestAnimate(true) on first page load
+        // if fetchItem gets triggered by a new uploaded element, make a new animation that only animates in this new element
 
         if (!selectedCategory) {
             setLatestAnimate(true);
@@ -99,6 +123,41 @@ export default function Home() {
 
         fetchCategories();
     }, []);
+
+    const animateNewItems = (newItems: UploadedItem[]) => {
+        console.log('ANIMATE NEW ITEMS');
+
+        newItems.forEach((item, index) => {
+            const elem = itemsRef.current[index];
+            if (elem) {
+                console.log(item.id);
+                const leftPosition = item.rating != null && item.rating !== undefined
+                    ? `${item.rating}%`
+                    : `${Math.floor(Math.random() * 100) + 1}%`;
+
+                const topPosition = item.randomRating != null && item.randomRating !== undefined
+                    ? `${item.randomRating}%`
+                    : `${Math.floor(Math.random() * 100) + 1}%`;
+
+                gsap.fromTo(elem,
+                    {
+                        opacity: 0,
+                        top: '50%',
+                        left: '50%',
+                        scale: 0.1,
+                    },
+                    {
+                        duration: 1.5,
+                        opacity: 1,
+                        top: topPosition,
+                        left: leftPosition,
+                        scale: 1,
+                        ease: 'power2.out',
+                    }
+                );
+            }
+        });
+    };
 
     // GSAP animation
     const animateItems = useCallback(() => {
@@ -366,13 +425,15 @@ export default function Home() {
         // Fetch items and animate them
         const unsubscribe = fetchItems(category);
 
-        if (category) {
-            setCategoryAnimate(true);
-            setLatestAnimate(false);
+        // Trigger the latest animation on first load or when 'Latest' is clicked
+        if (category === null || category === '') {
+            setLatestAnimate(true); // Enable animation for the latest items
+            setCategoryAnimate(false); // Disable category-specific animation
         } else {
-            setLatestAnimate(true);
-            setCategoryAnimate(false);
+            setCategoryAnimate(true);
+            setLatestAnimate(false); // Disable latest animation for specific categories
         }
+
         return () => unsubscribe();
     };
 
