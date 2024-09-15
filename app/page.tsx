@@ -68,6 +68,8 @@ export default function Home() {
 
             // Check for new items by comparing with the previous items state
             if (!isFirstLoad) {
+                console.log('not first load');
+
                 const addedItems = newItems.filter(newItem =>
                     !previousItems.some(prevItem => prevItem.id === newItem.id)
                 );
@@ -79,10 +81,10 @@ export default function Home() {
             setUploadedItems(newItems);
             setPreviousItems(newItems); // Update the previous items for comparison
 
-            // First load handling or when 'Latest' is clicked
-            if (isFirstLoad || category === null || category === '') {
+            if (isFirstLoad) {
+                console.log('first load');
                 setIsFirstLoad(false); // Mark that the first load has completed
-                setLatestAnimate(true); // Trigger animation for latest items
+                setLatestAnimate(true); // Only trigger this on the first load
             }
         });
 
@@ -130,7 +132,6 @@ export default function Home() {
         newItems.forEach((item, index) => {
             const elem = itemsRef.current[index];
             if (elem) {
-                console.log(item.id);
                 const leftPosition = item.rating != null && item.rating !== undefined
                     ? `${item.rating}%`
                     : `${Math.floor(Math.random() * 100) + 1}%`;
@@ -425,15 +426,13 @@ export default function Home() {
         // Fetch items and animate them
         const unsubscribe = fetchItems(category);
 
-        // Trigger the latest animation on first load or when 'Latest' is clicked
-        if (category === null || category === '') {
-            setLatestAnimate(true); // Enable animation for the latest items
-            setCategoryAnimate(false); // Disable category-specific animation
-        } else {
+        if (category) {
             setCategoryAnimate(true);
-            setLatestAnimate(false); // Disable latest animation for specific categories
+            setLatestAnimate(false);
+        } else {
+            setLatestAnimate(true);
+            setCategoryAnimate(false);
         }
-
         return () => unsubscribe();
     };
 
