@@ -10,6 +10,7 @@ import HomeModal from "@components/homeModal/HomeModal";
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { Timestamp } from 'firebase/firestore';
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 interface UploadedItem {
@@ -21,7 +22,7 @@ interface UploadedItem {
     id: number;
     createdAt: Date;
     editedAt: Date;
-    sortDate: Date;
+    sortDate: Timestamp;
     allRatings: number[];
 }
 
@@ -56,35 +57,32 @@ export default function Home() {
         } else {
             q = query(itemsRef, orderBy('sortDate', 'desc'), limit(15));
         }
+        console.log('AAAAAAAAAAA');
+        console.log(category);
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            const newItems = snapshot.docs.map((doc) => {
-                const data = doc.data();
-                return {
-                    ...data,
-                    sortDate: data.sortDate?.toDate(),
-                } as UploadedItem;
-            });
-
-            // Check for new items by comparing with the previous items state
-            if (!isFirstLoad) {
-                console.log('not first load');
-
-                const addedItems = newItems.filter(newItem =>
-                    !previousItems.some(prevItem => prevItem.id === newItem.id)
-                );
-                if (addedItems.length > 0) {
-                    animateNewItems(addedItems); // Animate only the newly added items
-                }
+            if (category) {
+                const items = snapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        ...data,
+                        sortDate: data.sortDate?.toDate(),
+                    } as UploadedItem;
+                });
+                setUploadedItems(items);
             }
 
-            setUploadedItems(newItems);
-            setPreviousItems(newItems); // Update the previous items for comparison
+            const addedItems = snapshot.docChanges()
+                .filter((change) => change.type === 'added')
+                .map((change) => {
+                    const newItem = change.doc.data() as UploadedItem;
+                    //newItem.sortDate = newItem.sortDate instanceof Date ? newItem.sortDate : new Date(newItem.sortDate);
+                    return newItem;
+                });
 
-            if (isFirstLoad) {
-                console.log('first load');
-                setIsFirstLoad(false); // Mark that the first load has completed
-                setLatestAnimate(true); // Only trigger this on the first load
+            if (addedItems.length == 1) {
+                setUploadedItems((prev) => [...prev, ...addedItems]);
+                animateNewItems(addedItems); // Animate only new items
             }
         });
 
@@ -92,25 +90,23 @@ export default function Home() {
     };
 
     useEffect(() => {
+        const unsubscribe = fetchItems(selectedCategory);
+
+        //if (!isFirstLoad) {
+        //    setLatestAnimate(true);
+        //}
+
+        setIsFirstLoad(false);
+
+        return () => unsubscribe();
+    }, [selectedCategory]);
+
+
+    useEffect(() => {
         // Instantly scroll to the top of the page when the component mounts
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }, []);
 
-    useEffect(() => {
-        console.log('fetchItems');
-        console.log(selectedCategory);
-        const unsubscribe = fetchItems(selectedCategory);
-
-        // maybe change here
-        // only setLatestAnimate(true) on first page load
-        // if fetchItem gets triggered by a new uploaded element, make a new animation that only animates in this new element
-
-        if (!selectedCategory) {
-            setLatestAnimate(true);
-        }
-
-        return () => unsubscribe();
-    }, [selectedCategory]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -127,34 +123,18 @@ export default function Home() {
     }, []);
 
     const animateNewItems = (newItems: UploadedItem[]) => {
-        console.log('ANIMATE NEW ITEMS');
+        console.log('ANIMATE NEW ITEM');
+        console.log(newItems);
 
         newItems.forEach((item, index) => {
-            const elem = itemsRef.current[index];
+            const elem = itemsRef.current[index]; // Make sure you use the right index
             if (elem) {
-                const leftPosition = item.rating != null && item.rating !== undefined
-                    ? `${item.rating}%`
-                    : `${Math.floor(Math.random() * 100) + 1}%`;
-
-                const topPosition = item.randomRating != null && item.randomRating !== undefined
-                    ? `${item.randomRating}%`
-                    : `${Math.floor(Math.random() * 100) + 1}%`;
+                const leftPosition = item.rating != null ? `${item.rating}%` : `${Math.random() * 100}%`;
+                const topPosition = item.randomRating != null ? `${item.randomRating}%` : `${Math.random() * 100}%`;
 
                 gsap.fromTo(elem,
-                    {
-                        opacity: 0,
-                        top: '50%',
-                        left: '50%',
-                        scale: 0.1,
-                    },
-                    {
-                        duration: 1.5,
-                        opacity: 1,
-                        top: topPosition,
-                        left: leftPosition,
-                        scale: 1,
-                        ease: 'power2.out',
-                    }
+                    { opacity: 0, top: '50%', left: '50%', scale: 0.1 },
+                    { opacity: 1, top: topPosition, left: leftPosition, scale: 1, duration: 1.5, ease: 'power2.out' }
                 );
             }
         });
@@ -300,7 +280,7 @@ export default function Home() {
             }
         );
 
-        console.log('testttt' + itemsRef.current.length); // is always 0
+        console.log('testttt' + itemsRef.current.length);
 
 
         // GSAP animation with ScrollTrigger for the rest of the elements
@@ -355,6 +335,7 @@ export default function Home() {
             animateLatest();
         }
     }, [latestAnimate, uploadedItems, animateLatest]);
+
 
     // Hover animation for uploaded items
     const handleMouseEnter = (index: number) => {
@@ -424,16 +405,17 @@ export default function Home() {
         }
 
         // Fetch items and animate them
-        const unsubscribe = fetchItems(category);
+        //const unsubscribe = fetchItems(category);
 
         if (category) {
             setCategoryAnimate(true);
             setLatestAnimate(false);
         } else {
+            console.log('setLatestAnimate true');
             setLatestAnimate(true);
             setCategoryAnimate(false);
         }
-        return () => unsubscribe();
+        //return () => unsubscribe();
     };
 
     const handleOpenHomeModal = () => {
@@ -526,7 +508,7 @@ export default function Home() {
                                 key={index}
                                 className="uploadedItem"
                                 ref={(el) => {
-                                    if (el) {
+                                    if (el && !itemsRef.current.includes(el)) {
                                         itemsRef.current[index] = el;
                                     }
                                 }}
@@ -559,7 +541,7 @@ export default function Home() {
                                         )}
                                     </div>
                                     <div className="item-details date-line">
-                                        <p>{item.sortDate?.toLocaleDateString('de-DE')}</p>
+                                        <p>{item.sortDate instanceof Timestamp ? item.sortDate.toDate().toLocaleDateString('de-AT') : new Date(item.sortDate).toLocaleDateString('de-AT')}</p>
                                     </div>
                                 </div>
                             </div>
