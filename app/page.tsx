@@ -57,47 +57,42 @@ export default function Home() {
         } else {
             q = query(itemsRef, orderBy('sortDate', 'desc'), limit(15));
         }
-        console.log('AAAAAAAAAAA');
-        console.log(category);
+        console.log('Fetching items for category:', category);
+
+        let initialLoad = true;
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            if (category) {
-                const items = snapshot.docs.map((doc) => {
-                    const data = doc.data();
-                    return {
-                        ...data,
-                        sortDate: data.sortDate?.toDate(),
-                    } as UploadedItem;
-                });
-                setUploadedItems(items);
-            }
+            const items = snapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                    ...data,
+                    sortDate: data.sortDate?.toDate(),
+                } as UploadedItem;
+            });
+            setUploadedItems(items);
 
-            const addedItems = snapshot.docChanges()
-                .filter((change) => change.type === 'added')
-                .map((change) => {
-                    const newItem = change.doc.data() as UploadedItem;
-                    //newItem.sortDate = newItem.sortDate instanceof Date ? newItem.sortDate : new Date(newItem.sortDate);
-                    return newItem;
-                });
+            if (initialLoad) {
+                initialLoad = false;
+            } else {
+                const addedItems = snapshot.docChanges()
+                    .filter((change) => change.type === 'added')
+                    .map((change) => {
+                        const newItem = change.doc.data() as UploadedItem;
+                        return newItem;
+                    });
 
-            if (addedItems.length == 1) {
-                setUploadedItems((prev) => [...prev, ...addedItems]);
-                animateNewItems(addedItems); // Animate only new items
+                if (addedItems.length > 0) {
+                    animateNewItems(addedItems); // Animate only new items
+                }
             }
         });
 
-        return () => unsubscribe();
+        return unsubscribe;
     };
+
 
     useEffect(() => {
         const unsubscribe = fetchItems(selectedCategory);
-
-        //if (!isFirstLoad) {
-        //    setLatestAnimate(true);
-        //}
-
-        setIsFirstLoad(false);
-
         return () => unsubscribe();
     }, [selectedCategory]);
 
@@ -123,11 +118,9 @@ export default function Home() {
     }, []);
 
     const animateNewItems = (newItems: UploadedItem[]) => {
-        console.log('ANIMATE NEW ITEM');
-        console.log(newItems);
-
-        newItems.forEach((item, index) => {
-            const elem = itemsRef.current[index]; // Make sure you use the right index
+        newItems.forEach((item) => {
+            const index = uploadedItems.findIndex((uploadedItem) => uploadedItem.id === item.id);
+            const elem = itemsRef.current[index];
             if (elem) {
                 const leftPosition = item.rating != null ? `${item.rating}%` : `${Math.random() * 100}%`;
                 const topPosition = item.randomRating != null ? `${item.randomRating}%` : `${Math.random() * 100}%`;
@@ -326,7 +319,6 @@ export default function Home() {
     useEffect(() => {
         if (categoryAnimate && uploadedItems.length > 0) {
             animateItems();
-            //setCategoryAnimate(false);
         }
     }, [categoryAnimate, uploadedItems, animateItems]);
 
@@ -393,30 +385,24 @@ export default function Home() {
         gsap.killTweensOf(itemsRef.current);
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
-        // Update the category
+        // Reset the itemsRef
         itemsRef.current = [];
+
+        // Update the category
         setSelectedCategory(category);
 
         if (category) {
             const selectedCategoryData = categories.find(cat => cat.id === category);
             setCategoryData(selectedCategoryData || null);
-        } else {
-            setCategoryData(null);
-        }
-
-        // Fetch items and animate them
-        //const unsubscribe = fetchItems(category);
-
-        if (category) {
             setCategoryAnimate(true);
             setLatestAnimate(false);
         } else {
-            console.log('setLatestAnimate true');
+            setCategoryData(null);
             setLatestAnimate(true);
             setCategoryAnimate(false);
         }
-        //return () => unsubscribe();
     };
+
 
     const handleOpenHomeModal = () => {
         setHomeModalOpen(true);
