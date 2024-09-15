@@ -1,16 +1,15 @@
 'use client';
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
 import RedirectBasedOnWidth from '@components/redirectBasedOnWidth/RedirectBasedOnWidth';
 import Image from "next/image";
-import {collection, getDocs, limit, onSnapshot, orderBy, query, where} from 'firebase/firestore';
-import {db} from '@/lib/firebase';
+import { collection, query, where, orderBy, onSnapshot, getDocs, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import "@styles/home.scss";
 import HomeModal from "@components/homeModal/HomeModal";
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
-import {ScrollToPlugin} from 'gsap/ScrollToPlugin';
-
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 interface UploadedItem {
@@ -38,6 +37,7 @@ interface CategoryData {
 
 export default function Home() {
     const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([]);
+    const [previousItems, setPreviousItems] = useState<UploadedItem[]>([]); // Track previous items
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [isHomeModalOpen, setHomeModalOpen] = useState<boolean>(false);
     const [categories, setCategories] = useState<CategoryData[]>([]);
@@ -45,97 +45,51 @@ export default function Home() {
     const itemsRef = useRef<HTMLDivElement[]>([]);
     const [categoryAnimate, setCategoryAnimate] = useState(false);
     const [latestAnimate, setLatestAnimate] = useState(false);
-    //const [isFirstLoad, setIsFirstLoad] = useState(true); // New state for first load tracking
+    const [isFirstLoad, setIsFirstLoad] = useState(true); // New state for first load tracking
 
 
     const fetchItems = (category: string | null) => {
-        const itemsRefCollection = collection(db, 'realitems');
+        const itemsRef = collection(db, 'realitems');
         let q;
         if (category) {
-            q = query(
-                itemsRefCollection,
-                where('category', '==', category),
-                orderBy('sortDate', 'desc'),
-                limit(15)
-            );
+            q = query(itemsRef, where('category', '==', category), orderBy('sortDate', 'desc'), limit(15));
         } else {
-            q = query(itemsRefCollection, orderBy('sortDate', 'desc'), limit(15));
+            q = query(itemsRef, orderBy('sortDate', 'desc'), limit(15));
         }
 
-        return onSnapshot(q, (snapshot) => {
-            snapshot.docChanges().forEach(async (change) => {
-                const data = change.doc.data();
-                const item = {
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const newItems = snapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
                     ...data,
                     sortDate: data.sortDate?.toDate(),
                 } as UploadedItem;
-
-                if (change.type === 'added') {
-                    try {
-                        // Load the image and ensure it's ready before updating the state
-                        await loadImage(item.fileUrl);
-
-                        // Update the state only after the image is loaded
-                        setUploadedItems((prevItems) => {
-                            const exists = prevItems.some((prevItem) => prevItem.id === item.id);
-                            if (!exists) {
-                                return [item, ...prevItems].slice(0, 15); // Keep only the latest 15 items
-                            }
-                            return prevItems;
-                        });
-
-                        // Animate the new item
-                        animateNewItems([item]);
-                    } catch (error) {
-                        console.error('Image failed to load:', item.fileUrl);
-                        // handle the error e.g: show a placeholder image or skip rendering this item
-                    }
-                } else if (change.type === 'modified') {
-                    setUploadedItems((prevItems) => {
-                        const index = prevItems.findIndex((prevItem) => prevItem.id === item.id);
-                        if (index !== -1) {
-                            const updatedItems = [...prevItems];
-                            updatedItems[index] = item;
-                            return updatedItems;
-                        }
-                        return prevItems;
-                    });
-                } else if (change.type === 'removed') {
-                    setUploadedItems((prevItems) => prevItems.filter((prevItem) => prevItem.id !== item.id));
-                }
             });
-        });
-    }
 
-   /* const fetchLatestItem = async () => {
-        const itemsRef = collection(db, 'realitems');
-        const q = query(itemsRef, orderBy('sortDate', 'desc'), limit(1));
-        const snapshot = await getDocs(q);
-        const newItems = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-                ...data,
-                sortDate: data.sortDate?.toDate(),
-            } as UploadedItem;
+            // Check for new items by comparing with the previous items state
+            if (!isFirstLoad) {
+                console.log('not first load');
+
+                const addedItems = newItems.filter(newItem =>
+                    !previousItems.some(prevItem => prevItem.id === newItem.id)
+                );
+                if (addedItems.length > 0) {
+                    animateNewItems(addedItems); // Animate only the newly added items
+                }
+            }
+
+            setUploadedItems(newItems);
+            setPreviousItems(newItems); // Update the previous items for comparison
+
+            if (isFirstLoad) {
+                console.log('first load');
+                setIsFirstLoad(false); // Mark that the first load has completed
+                setLatestAnimate(true); // Only trigger this on the first load
+            }
         });
 
-        if (newItems.length > 0) {
-            // Prepend the new item to the existing list
-            setUploadedItems((prevItems) => [...newItems, ...prevItems]);
-            // Animate the new item
-            animateNewItems(newItems);
-        }
-    }; */
-
-    const loadImage = (fileUrl: string): Promise<boolean> => {
-        return new Promise((resolve, reject) => {
-            const img = document.createElement('img') as HTMLImageElement;
-            img.src = fileUrl;
-            img.onload = () => resolve(true);
-            img.onerror = () => reject(false);
-        });
+        return () => unsubscribe();
     };
-
 
     useEffect(() => {
         // Instantly scroll to the top of the page when the component mounts
@@ -588,10 +542,6 @@ export default function Home() {
                                          if (element) {
                                              gsap.to(element, {visibility: 'visible'});
                                          }
-                                     }}
-                                     onError={() => {
-                                         console.error(`Failed to load image: ${item.fileUrl}`);
-                                         // Optionally handle failed image loads
                                      }}
                                 />
 
