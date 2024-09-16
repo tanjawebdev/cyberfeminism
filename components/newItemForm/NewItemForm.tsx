@@ -316,9 +316,7 @@ const NewItemForm: React.FC = () => {
 
             <div className="upload-wrap">
                 <span className="chooseImage">Choose Item Image*</span>
-                <button type="button" onClick={handleGoogleSearch} className="form-group file-upload-item upload-google-image">
-                    Recommended Image
-                </button>
+                <button type="button" onClick={handleGoogleSearch} className="form-group file-upload-item upload-google-image"></button>
 
                 {imageURL && confirmImage && (
                     <div className="form-group googleImage-wrapper">
