@@ -10,7 +10,6 @@ import HomeModal from "@components/homeModal/HomeModal";
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
-import { Timestamp } from 'firebase/firestore';
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 interface UploadedItem {
@@ -22,7 +21,7 @@ interface UploadedItem {
     id: number;
     createdAt: Date;
     editedAt: Date;
-    sortDate: Timestamp;
+    sortDate: Date;
     allRatings: number[];
 }
 
@@ -38,7 +37,6 @@ interface CategoryData {
 
 export default function Home() {
     const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([]);
-    const [previousItems, setPreviousItems] = useState<UploadedItem[]>([]); // Track previous items
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [isHomeModalOpen, setHomeModalOpen] = useState<boolean>(false);
     const [categories, setCategories] = useState<CategoryData[]>([]);
@@ -46,7 +44,6 @@ export default function Home() {
     const itemsRef = useRef<HTMLDivElement[]>([]);
     const [categoryAnimate, setCategoryAnimate] = useState(false);
     const [latestAnimate, setLatestAnimate] = useState(false);
-    const [isFirstLoad, setIsFirstLoad] = useState(true); // New state for first load tracking
 
 
     const fetchItems = (category: string | null) => {
@@ -57,9 +54,6 @@ export default function Home() {
         } else {
             q = query(itemsRef, orderBy('sortDate', 'desc'), limit(15));
         }
-        console.log('Fetching items for category:', category);
-
-        let initialLoad = true;
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const items = snapshot.docs.map((doc) => {
@@ -70,38 +64,27 @@ export default function Home() {
                 } as UploadedItem;
             });
             setUploadedItems(items);
-
-            if (initialLoad) {
-                initialLoad = false;
-            } else {
-                const addedItems = snapshot.docChanges()
-                    .filter((change) => change.type === 'added')
-                    .map((change) => {
-                        const newItem = change.doc.data() as UploadedItem;
-                        return newItem;
-                    });
-
-                if (addedItems.length > 0) {
-                    animateNewItems(addedItems); // Animate only new items
-                }
-            }
         });
 
-        return unsubscribe;
-    };
-
-
-    useEffect(() => {
-        const unsubscribe = fetchItems(selectedCategory);
         return () => unsubscribe();
-    }, [selectedCategory]);
-
+    };
 
     useEffect(() => {
         // Instantly scroll to the top of the page when the component mounts
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }, []);
 
+    useEffect(() => {
+        console.log('fetchItems');
+        console.log(selectedCategory);
+        const unsubscribe = fetchItems(selectedCategory);
+
+        if (!selectedCategory) {
+            setLatestAnimate(true);
+        }
+
+        return () => unsubscribe();
+    }, [selectedCategory]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -116,22 +99,6 @@ export default function Home() {
 
         fetchCategories();
     }, []);
-
-    const animateNewItems = (newItems: UploadedItem[]) => {
-        newItems.forEach((item) => {
-            const index = uploadedItems.findIndex((uploadedItem) => uploadedItem.id === item.id);
-            const elem = itemsRef.current[index];
-            if (elem) {
-                const leftPosition = item.rating != null ? `${item.rating}%` : `${Math.random() * 100}%`;
-                const topPosition = item.randomRating != null ? `${item.randomRating}%` : `${Math.random() * 100}%`;
-
-                gsap.fromTo(elem,
-                    { opacity: 0, top: '50%', left: '50%', scale: 0.1 },
-                    { opacity: 1, top: topPosition, left: leftPosition, scale: 1, duration: 1.5, ease: 'power2.out' }
-                );
-            }
-        });
-    };
 
     // GSAP animation
     const animateItems = useCallback(() => {
@@ -273,7 +240,7 @@ export default function Home() {
             }
         );
 
-        console.log('testttt' + itemsRef.current.length);
+        console.log('testttt' + itemsRef.current.length); // is always 0
 
 
         // GSAP animation with ScrollTrigger for the rest of the elements
@@ -319,6 +286,7 @@ export default function Home() {
     useEffect(() => {
         if (categoryAnimate && uploadedItems.length > 0) {
             animateItems();
+            //setCategoryAnimate(false);
         }
     }, [categoryAnimate, uploadedItems, animateItems]);
 
@@ -327,7 +295,6 @@ export default function Home() {
             animateLatest();
         }
     }, [latestAnimate, uploadedItems, animateLatest]);
-
 
     // Hover animation for uploaded items
     const handleMouseEnter = (index: number) => {
@@ -385,24 +352,29 @@ export default function Home() {
         gsap.killTweensOf(itemsRef.current);
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
-        // Reset the itemsRef
-        itemsRef.current = [];
-
         // Update the category
+        itemsRef.current = [];
         setSelectedCategory(category);
 
         if (category) {
             const selectedCategoryData = categories.find(cat => cat.id === category);
             setCategoryData(selectedCategoryData || null);
+        } else {
+            setCategoryData(null);
+        }
+
+        // Fetch items and animate them
+        const unsubscribe = fetchItems(category);
+
+        if (category) {
             setCategoryAnimate(true);
             setLatestAnimate(false);
         } else {
-            setCategoryData(null);
             setLatestAnimate(true);
             setCategoryAnimate(false);
         }
+        return () => unsubscribe();
     };
-
 
     const handleOpenHomeModal = () => {
         setHomeModalOpen(true);
@@ -450,8 +422,8 @@ export default function Home() {
                 <span className="bottom">{categoryData?.individualSliderMinTitle || ''}</span>
             </div>
             <div className="home__home-pager">
-                    <span className="text">Most recent items shown:</span>
-                    <span className="number">15</span>
+                <span className="text">Most recent items shown:</span>
+                <span className="number">15</span>
             </div>
             <div className="home__container">
                 <div className="home__uploadedItems">
@@ -494,7 +466,7 @@ export default function Home() {
                                 key={index}
                                 className="uploadedItem"
                                 ref={(el) => {
-                                    if (el && !itemsRef.current.includes(el)) {
+                                    if (el) {
                                         itemsRef.current[index] = el;
                                     }
                                 }}
@@ -502,16 +474,17 @@ export default function Home() {
                                 onMouseLeave={() => handleMouseLeave(index)}
                                 style={{visibility: 'hidden'}}
                             >
-                                <img src={item.fileUrl}
-                                     alt="Logo"
-                                     className="item-image"
-                                     onLoad={(e) => {
-                                         const element = itemsRef.current[index];
-                                         if (element) {
-                                             gsap.to(element, {visibility: 'visible'});
-                                         }
-                                     }}
-                                />
+
+                                    <img src={item.fileUrl}
+                                         alt="Logo"
+                                         className="item-image"
+                                         onLoad={(e) => {
+                                             const element = itemsRef.current[index];
+                                             if (element) {
+                                                 gsap.to(element, {visibility: 'visible'});
+                                             }
+                                         }}
+                                    />
 
                                 <div className="item-info">
                                     <div className="item-details first-line">
@@ -527,7 +500,7 @@ export default function Home() {
                                         )}
                                     </div>
                                     <div className="item-details date-line">
-                                        <p>{item.sortDate instanceof Timestamp ? item.sortDate.toDate().toLocaleDateString('de-AT') : new Date(item.sortDate).toLocaleDateString('de-AT')}</p>
+                                        <p>{item.sortDate?.toLocaleDateString('de-DE')}</p>
                                     </div>
                                 </div>
                             </div>
