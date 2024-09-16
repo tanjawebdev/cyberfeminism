@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useEffect, useState, useRef, useCallback} from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import RedirectBasedOnWidth from '@components/redirectBasedOnWidth/RedirectBasedOnWidth';
 import Image from "next/image";
 import { collection, query, where, orderBy, onSnapshot, getDocs, limit } from 'firebase/firestore';
@@ -35,6 +35,12 @@ interface CategoryData {
     individualQuestion: string;
 }
 
+interface DelayedItemProps {
+    item: UploadedItem;
+    index: number;
+    itemsRef: React.MutableRefObject<HTMLDivElement[]>;
+}
+
 export default function Home() {
     const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -44,7 +50,6 @@ export default function Home() {
     const itemsRef = useRef<HTMLDivElement[]>([]);
     const [categoryAnimate, setCategoryAnimate] = useState(false);
     const [latestAnimate, setLatestAnimate] = useState(false);
-
 
     const fetchItems = (category: string | null) => {
         const itemsRef = collection(db, 'realitems');
@@ -70,13 +75,10 @@ export default function Home() {
     };
 
     useEffect(() => {
-        // Instantly scroll to the top of the page when the component mounts
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }, []);
 
     useEffect(() => {
-        console.log('fetchItems');
-        console.log(selectedCategory);
         const unsubscribe = fetchItems(selectedCategory);
 
         if (!selectedCategory) {
@@ -99,6 +101,7 @@ export default function Home() {
 
         fetchCategories();
     }, []);
+
 
     // GSAP animation
     const animateItems = useCallback(() => {
@@ -339,20 +342,18 @@ export default function Home() {
         });
     };
 
+
     const handleCategoryClick = (category: string | null) => {
         const headerTextElement = document.querySelector('.headertext') as HTMLElement;
         if (headerTextElement) {
             headerTextElement.style.opacity = '0';
         }
 
-        // Instantly scroll to the top of the page
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
-        // Clear all existing animations and triggers
         gsap.killTweensOf(itemsRef.current);
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
-        // Update the category
         itemsRef.current = [];
         setSelectedCategory(category);
 
@@ -363,7 +364,6 @@ export default function Home() {
             setCategoryData(null);
         }
 
-        // Fetch items and animate them
         const unsubscribe = fetchItems(category);
 
         if (category) {
@@ -398,16 +398,76 @@ export default function Home() {
         return category ? category.individualSliderMaxTitle : 'Unknown';
     };
 
+    // Your DelayedItem component here
+    const DelayedItem: React.FC<DelayedItemProps> = ({ item, index, itemsRef }) => {
+        const [imageSrc, setImageSrc] = useState<string | null>(null);
+        const delayBeforeLoading = 500; // 3 seconds delay
+
+        useEffect(() => {
+            const loadImage = setTimeout(() => {
+                setImageSrc(item.fileUrl);
+            }, delayBeforeLoading);
+
+            return () => clearTimeout(loadImage);
+        }, [item.fileUrl]);
+
+        return (
+            <div
+                key={index}
+                className="uploadedItem"
+                ref={(el) => {
+                    if (el) {
+                        itemsRef.current[index] = el;
+                    }
+                }}
+                onMouseEnter={() => handleMouseEnter(index)}
+                onMouseLeave={() => handleMouseLeave(index)}
+                style={{visibility: 'hidden'}}
+            >
+                {imageSrc ? (
+                    <img
+                        src={imageSrc}
+                        alt="Logo"
+                        className="item-image"
+                        onLoad={(e) => {
+                            const element = itemsRef.current[index];
+                            if (element) {
+                                gsap.to(element, {visibility: 'visible'});
+                            }
+                        }}
+                        onError={(e) => {
+                            e.currentTarget.src = imageSrc;
+                        }}
+                    />
+                ) : (
+                    <p>Loading...</p>
+                )}
+                <div className="item-info">
+                    <div className="item-details first-line">
+                        <p>⌀ Rating ({item.allRatings.length}):</p>
+                        <p>ID: {item.id}</p>
+                    </div>
+                    <div className="item-details second-line">
+                        <p>{item.rating}% sexist</p>
+                        {categoryData && (
+                            <p>
+                                {item.individualRating}% {categoryData?.individualSliderMaxTitleShort}
+                            </p>
+                        )}
+                    </div>
+                    <div className="item-details date-line">
+                        <p>{item.sortDate?.toLocaleDateString('de-DE')}</p>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <main className="home">
             <RedirectBasedOnWidth/>
             <div className="home__logo">
-                <Image
-                    src="/icons/logo.svg"
-                    alt="Logo"
-                    width={160}
-                    height={70}
-                />
+                <Image src="/icons/logo.svg" alt="Logo" width={160} height={70}/>
             </div>
             <div className="home__home-modal">
                 <div className="btn btn-textlink" onClick={handleOpenHomeModal}>
@@ -433,11 +493,9 @@ export default function Home() {
                                 Your latest submissions
                             </span>
                             : ''}
-
                         <h1 className="cat-headline">
                             {categoryData?.individualQuestion || 'Ra(n)ting: How Sexist Is The Media?'}
                         </h1>
-
                         {selectedCategory === null ?
                             <button className="btn btn-primary"
                                     onClick={() => handleCategoryClick("option1")}>
@@ -446,10 +504,7 @@ export default function Home() {
                             :
                             <div className="scroll-hint"
                                  onClick={startScrolling}>
-                                <span>
-                                    Scroll through submissions
-                                </span>
-
+                                <span>Scroll through submissions</span>
                                 <svg className="arrows">
                                     <path className="a1" d="M0 0 L30 32 L60 0"></path>
                                     <path className="a2" d="M0 20 L30 52 L60 20"></path>
@@ -460,58 +515,24 @@ export default function Home() {
                     </div>
 
 
-                    {uploadedItems.map((item, index) => {
-                        return (
-                            <div
-                                key={index}
-                                className="uploadedItem"
-                                ref={(el) => {
-                                    if (el) {
-                                        itemsRef.current[index] = el;
-                                    }
-                                }}
-                                onMouseEnter={() => handleMouseEnter(index)}
-                                onMouseLeave={() => handleMouseLeave(index)}
-                                style={{visibility: 'hidden'}}
-                            >
+                        {uploadedItems.map((item, index) => {
+                                return (
 
-                                    <img src={item.fileUrl}
-                                         alt="Logo"
-                                         className="item-image"
-                                         onLoad={(e) => {
-                                             const element = itemsRef.current[index];
-                                             if (element) {
-                                                 gsap.to(element, {visibility: 'visible'});
-                                             }
-                                         }}
-                                    />
 
-                                <div className="item-info">
-                                    <div className="item-details first-line">
-                                        <p>⌀ Rating ({item.allRatings.length}):</p>
-                                        <p>ID: {item.id}</p>
-                                    </div>
-                                    <div className="item-details second-line">
-                                        <p>{item.rating}% sexist</p>
-                                        {categoryData && (
-                                            <p>
-                                                {item.individualRating}% {categoryData?.individualSliderMaxTitleShort}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="item-details date-line">
-                                        <p>{item.sortDate?.toLocaleDateString('de-DE')}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
+                                        <DelayedItem
+                                            key={index}
+                                            item={item}
+                                            index={index}
+                                            itemsRef={itemsRef}
+                                        />
+                                );
+                            })}
                 </div>
             </div>
             <div className={`path-bg ${latestAnimate ? 'path-bg-small' : ''}`}></div>
             <div className="bg-video">
                 <video autoPlay loop muted playsInline>
-                    <source src="/loop.mp4" type="video/mp4"/>
+                    <source src="/loop.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
             </div>
@@ -519,7 +540,6 @@ export default function Home() {
                 <div className={`btn btn-secondary ${selectedCategory === null ? 'active' : ''}`}
                      onClick={() => handleCategoryClick(null)}>Latest
                 </div>
-
                 {categories.map((category) => (
                     <div key={category.id}
                          className={`btn btn-secondary ${selectedCategory === category.id ? 'active' : ''}`}
@@ -528,8 +548,7 @@ export default function Home() {
                     </div>
                 ))}
             </div>
-
-            <HomeModal isOpen={isHomeModalOpen} onClose={handleCloseHomeModal}/>
+            <HomeModal isOpen={isHomeModalOpen} onClose={handleCloseHomeModal} />
         </main>
     );
 }
