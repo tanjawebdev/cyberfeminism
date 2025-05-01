@@ -108,6 +108,14 @@
   left: 0;
 }
 
+.home__scroller {
+  position: fixed;
+  z-index: 100;
+  bottom: 1.75rem;
+  right: 200px;
+  width: 300px;
+}
+
 .home__home-modal {
   position: fixed;
   top: 0;
@@ -140,6 +148,7 @@
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
+  line-height: 35px;
 
   .number {
     font-family: "NeueMetana", serif;

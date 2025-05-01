@@ -10,6 +10,7 @@ import HomeModal from "@components/homeModal/HomeModal";
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import Scroller from "@components/scroller/Scroller";
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 interface UploadedItem {
@@ -127,9 +128,6 @@ export default function Home() {
                 ease: 'power2.out'
             }
         );
-
-        console.log('testttt' + itemsRef.current.length); // is always 0
-
 
         // GSAP animation with ScrollTrigger for the rest of the elements
         if (itemsRef.current.length > 0) {
@@ -455,9 +453,11 @@ export default function Home() {
                             </p>
                         )}
                     </div>
+                    {/*
                     <div className="item-details date-line">
                         <p>{item.sortDate?.toLocaleDateString('de-DE')}</p>
                     </div>
+                    */}
                 </div>
             </div>
         );
@@ -475,6 +475,17 @@ export default function Home() {
                     <span className="big-symbol">?</span>
                 </div>
             </div>
+            <div className="home__scroller">
+                {selectedCategory === null ? '' :
+                    <Scroller
+                        min={0}
+                        max={100}
+                        step={1}
+                        initialValue={0}
+                        onChange={(v) => console.log('Value:', v)}
+                    />
+                }
+            </div>
             <div className="home__coordinate-system">
                 <span className="left">feminist</span>
                 <span className="right">sexist</span>
@@ -482,8 +493,15 @@ export default function Home() {
                 <span className="bottom">{categoryData?.individualSliderMinTitle || ''}</span>
             </div>
             <div className="home__home-pager">
-                <span className="text">Most recent items shown:</span>
-                <span className="number">15</span>
+                {selectedCategory === null ?
+                    <>
+                        <span className="text">Most recent items shown:</span>
+                        <span className="number">15</span>
+                    </>
+                    :
+                    <span className="text">scroll through uploads</span>
+                }
+
             </div>
             <div className="home__container">
                 <div className="home__uploadedItems">
@@ -504,7 +522,7 @@ export default function Home() {
                             :
                             <div className="scroll-hint"
                                  onClick={startScrolling}>
-                                <span>Scroll through submissions</span>
+                                <span>See your submissions</span>
                                 <svg className="arrows">
                                     <path className="a1" d="M0 0 L30 32 L60 0"></path>
                                     <path className="a2" d="M0 20 L30 52 L60 20"></path>
