@@ -6,7 +6,6 @@ interface ScrollerProps {
     max?: number;
     step?: number;
     initialValue?: number;
-    onChange?: (val: number) => void;
     disabled?: boolean;
 }
 
@@ -15,14 +14,21 @@ const Scroller: React.FC<ScrollerProps> = ({
                                                max = 100,
                                                step = 1,
                                                initialValue = min,
-                                               onChange,
                                                disabled = false,
                                            }) => {
     const [value, setValue] = useState(initialValue);
     const [dragging, setDragging] = useState(false);
     const trackRef = useRef<HTMLDivElement>(null);
 
-    const percent = () => ((value - min) / (max - min)) * 100;
+    // Prozent-Wert 0–1
+    const pct = (val: number) => (val - min) / (max - min);
+
+    // scrollt auf pct(0–1) der Seite
+    const scrollToPct = (p: number) => {
+        const doc = document.documentElement;
+        const scrollable = doc.scrollHeight - window.innerHeight;
+        window.scrollTo({ top: scrollable * p, behavior: 'auto' });
+    };
 
     const updateValue = (clientX: number) => {
         if (!trackRef.current) return;
@@ -32,7 +38,7 @@ const Scroller: React.FC<ScrollerProps> = ({
         const raw = min + p * (max - min);
         const snapped = Math.round(raw / step) * step;
         setValue(snapped);
-        onChange?.(snapped);
+        scrollToPct(p);
     };
 
     const onMouseDownThumb = (e: React.MouseEvent) => {
@@ -67,7 +73,7 @@ const Scroller: React.FC<ScrollerProps> = ({
             >
                 <div
                     className="scroller__filled"
-                    style={{ width: `${percent()}%` }}
+                    style={{ width: `${pct(value) * 100}%` }}
                 />
                 <div
                     role="slider"
@@ -76,7 +82,7 @@ const Scroller: React.FC<ScrollerProps> = ({
                     aria-valuenow={value}
                     tabIndex={disabled ? -1 : 0}
                     className={`scroller__thumb ${dragging ? 'active' : ''}`}
-                    style={{ left: `${percent()}%` }}
+                    style={{ left: `${pct(value) * 100}%` }}
                     onMouseDown={onMouseDownThumb}
                     onKeyDown={(e) => {
                         if (disabled) return;
@@ -84,8 +90,9 @@ const Scroller: React.FC<ScrollerProps> = ({
                         if (e.key === 'ArrowRight' || e.key === 'ArrowUp') v = Math.min(value + step, max);
                         if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') v = Math.max(value - step, min);
                         if (v !== value) {
+                            const p = pct(v);
                             setValue(v);
-                            onChange?.(v);
+                            scrollToPct(p);
                         }
                     }}
                 />

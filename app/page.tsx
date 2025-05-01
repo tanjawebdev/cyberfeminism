@@ -51,6 +51,7 @@ export default function Home() {
     const itemsRef = useRef<HTMLDivElement[]>([]);
     const [categoryAnimate, setCategoryAnimate] = useState(false);
     const [latestAnimate, setLatestAnimate] = useState(false);
+    const [scrollerKey, setScrollerKey] = useState(0)
 
     const fetchItems = (category: string | null) => {
         const itemsRef = collection(db, 'realitems');
@@ -348,6 +349,7 @@ export default function Home() {
         }
 
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        setScrollerKey(k => k + 1);
 
         gsap.killTweensOf(itemsRef.current);
         ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -380,6 +382,7 @@ export default function Home() {
 
     const handleCloseHomeModal = () => {
         setHomeModalOpen(false);
+        handleCategoryClick(null);
     };
 
     const startScrolling = () => {
@@ -478,11 +481,11 @@ export default function Home() {
             <div className="home__scroller">
                 {selectedCategory === null ? '' :
                     <Scroller
+                        key={scrollerKey}
                         min={0}
                         max={100}
                         step={1}
                         initialValue={0}
-                        onChange={(v) => console.log('Value:', v)}
                     />
                 }
             </div>
