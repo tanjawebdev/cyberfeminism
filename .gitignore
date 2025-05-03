@@ -20,6 +20,10 @@
 .DS_Store
 *.pem
 .env.local
+/serviceAccountKey.json
+/public/images/exports
+/public/images/uploads
+/data/firestore.json
 
 # debug
 npm-debug.log*

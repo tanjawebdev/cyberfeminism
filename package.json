@@ -6,7 +6,9 @@
     "dev": "next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync:firebase": "node scripts/syncFirebase.js",
+    "build:static": "npm run sync:firebase && next build && next export"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
