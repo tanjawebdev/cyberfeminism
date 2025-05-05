@@ -20,6 +20,10 @@
 .DS_Store
 *.pem
 .env.local
+/public/images
+/config
+serviceAccountKey.json
+data/
 
 # debug
 npm-debug.log*
