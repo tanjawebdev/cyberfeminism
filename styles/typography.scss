@@ -40,6 +40,13 @@ body {
   touch-action: pan-x pan-y;
 }
 
+html,body {
+  @media (max-width: 992px){
+    overflow-y: auto;
+    height: auto;
+  }
+}
+
 strong {
   font-weight: 500;
 }

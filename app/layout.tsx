@@ -7,7 +7,6 @@ import "@styles/globalsDesktop.scss";
 export const metadata: Metadata = {
   title: "Cyberfeminism",
   description: "A digital intervention",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
   icons: {
     icon: [
       { rel: "icon", url: "/favicon.ico" },
